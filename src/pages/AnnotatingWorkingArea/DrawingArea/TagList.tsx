@@ -1,6 +1,6 @@
 import React from "react";
-import "../style/Tag.css"
-import Tag from "./Tag";
+import "../../../style/Tag.css"
+import Tag from "../../../data/Tag";
 import {TagLabel, TagLabelMode} from "./TagLabel";
 
 interface TagListProps {

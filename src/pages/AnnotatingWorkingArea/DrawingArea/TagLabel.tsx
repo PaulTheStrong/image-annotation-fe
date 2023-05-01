@@ -1,7 +1,7 @@
 import React, {useState} from "react";
-import Tag from "./Tag";
+import Tag from "../../../data/Tag";
 import {HexColorPicker} from "react-colorful";
-import cross from "../assets/cross.png"
+import cross from "../../../assets/cross.png"
 
 interface TagProps {
     tag: Tag;

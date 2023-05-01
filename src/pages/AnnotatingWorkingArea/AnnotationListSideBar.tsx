@@ -6,5 +6,10 @@ interface AnnotationListSideBarProps {
 
 export const AnnotationListSideBar: React.FC<AnnotationListSideBarProps> = ({imageId}) => {
 
-    return <div className="annotationListSideBar">Annotations side bar</div>
+    return (
+        <div className="annotationListSideBar">
+            Annotations side bar
+        </div>
+    )
+
 }

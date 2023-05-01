@@ -4,7 +4,7 @@ import {PreviewAnnotationImageTable} from "./PreviewAnnotationImageTable";
 import axios from "axios";
 import {PROJECT_IMAGES_BASE_URL} from "../../util/constants";
 import ProjectContext from "../../context/ProjectContext";
-import {BoundingBoxCanvas} from "../../annotations/BoundingBoxCanvas";
+import {BoundingBoxCanvas} from "../AnnotatingWorkingArea/DrawingArea/BoundingBoxCanvas";
 import {AnnotatingWorkingArea} from "../AnnotatingWorkingArea/AnnotatingWorkingArea";
 
 interface ProjectViewPageProps {

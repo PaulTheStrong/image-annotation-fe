@@ -1,18 +1,26 @@
 import React, {useState} from "react";
-import "../style/Tag.css"
-import Tag from "./Tag";
+import "../../../style/Tag.css"
+import Tag from "../../../data/Tag";
 import {TagLabel, TagLabelMode} from "./TagLabel";
 
 interface TagListEditorProps {
     onTagClick?: (tag: Tag) => void;
-    onAddTag: (tag: Tag) => void;
+    onTagAdd: (tag: Tag) => void;
     onTagUpdate: (tag: Tag) => void;
     onTagRemove: (tag: Tag) => void;
     tags: Tag[];
     currentTagId: number | undefined;
 }
 
-export const TagListEditor: React.FC<TagListEditorProps> = ({onTagClick, onAddTag, onTagUpdate, onTagRemove, tags, currentTagId}) => {
+export const TagListEditor: React.FC<TagListEditorProps> = (
+    {
+        onTagClick,
+        onTagAdd,
+        onTagUpdate,
+        onTagRemove,
+        tags,
+        currentTagId
+    }) => {
     const [newTagName, setNewTagName] = useState('');
 
     const handleAddTag = () => {
@@ -21,7 +29,7 @@ export const TagListEditor: React.FC<TagListEditorProps> = ({onTagClick, onAddTa
         const g = ("00" + Math.floor(Math.random() * 150).toString(16)).slice(-2);
         const b = ("00" + Math.floor(Math.random() * 150).toString(16)).slice(-2);
         const newTag = new Tag(newTagName, '#' + r + g + b);
-        onAddTag(newTag);
+        onTagAdd(newTag);
         setNewTagName('');
     };
 

@@ -14,6 +14,9 @@ html, body, .App, #root, .projectViewPage {
 .imageTable {
   width: 100%;
   border-collapse: collapse;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: auto;
 }
 
 .imageTableRow {
@@ -24,7 +27,7 @@ html, body, .App, #root, .projectViewPage {
   grid-column: 1 / 10;
   display: grid;
   grid-template-columns: minmax(30px, 0.1fr) 0.5fr 1fr 1fr minmax(30px, 120px) 1fr;
-  grid-template-rows: 60px;
+  grid-template-rows: 90px;
 }
 
 .imageTableHeader {
@@ -87,6 +90,7 @@ html, body, .App, #root, .projectViewPage {
 .previewAnnotationImageTableImageNonPicked {
   width: 100%;
   transition: width 0.2s ease-in-out;
+
 }
 
 .previewAnnotationImageTableImagePicked {
