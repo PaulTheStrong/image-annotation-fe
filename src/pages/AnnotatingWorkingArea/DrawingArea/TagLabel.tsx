@@ -10,11 +10,12 @@ interface TagProps {
     onTagRemove?: (tag: Tag) => void;
     mode: TagLabelMode;
     isPicked: boolean;
+    showId: number;
 }
 
 export enum TagLabelMode {ANNOTATING, EDITING}
 
-export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor, onTagRemove, isPicked}) => {
+export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor, onTagRemove, isPicked, showId}) => {
 
     const colorPadWrapperRef = React.createRef<HTMLDivElement>();
     const [color, setColor] = useState(tag.color);
@@ -75,7 +76,7 @@ export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor,
                     {tag.name}
                 </div>
                 <div style={{paddingRight: 8}}>
-                    {tag.id}
+                    {showId}
                 </div>
                 {mode === TagLabelMode.EDITING && (
                     <img style={{width: "inherit"}} src={cross} onClick={() => { if (onTagRemove) onTagRemove(tag)}}  alt=""/>

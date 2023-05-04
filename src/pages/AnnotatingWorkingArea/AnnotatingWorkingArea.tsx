@@ -1,30 +1,75 @@
 import React, {useContext, useEffect, useState} from "react";
 import ProjectContext from "../../context/ProjectContext";
-import {BoundingBoxCanvas} from "./DrawingArea/BoundingBoxCanvas";
 import {AnnotatingWorkingAreaHeader} from "./AnnotatingWorkingAreaHeader";
 import {AnnotatingWorkingAreaFooter} from "./AnnotatingWorkingAreaFooter";
-import {AnnotationListSideBar} from "./AnnotationListSideBar";
-import {AnnotationQualityRightSidebar} from "./AnnotationQualityRightSidebar";
+import {AnnotationListSideBar} from "./AnnotationListSideBar/AnnotationListSideBar";
+import {AnnotationQualityRightSidebar} from "./AnnotationQualityRightSidebar/AnnotationQualityRightSidebar";
 import {BoundingBox} from "./DrawingArea/BoundingBox";
 import Tag from "../../data/Tag";
 import {AnnotatingArea} from "./DrawingArea/AnnotatingArea";
 import axios from "axios";
-import {BBOX_ANNOTATIONS_BASE_URL, PROJECT_TAGS_BASE_URL} from "../../util/constants";
+import {BBOX_ANNOTATIONS_BASE_URL, COMMENTS_BASE_URL, PROJECT_TAGS_BASE_URL, replaceRefs} from "../../util/constants";
+import Annotation from "../../data/Annotation";
+import {AnnotationType} from "../../data/AnnotatoinType";
+import TagsContext from "../../context/TagsContext";
+import CurrentAnnotationContext from "../../context/CurrentAnnotationContext";
+import ImageContext from "../../context/ImageContext";
+import AnnotationImage from "../../data/AnnotationImage";
+import Comment from "../../data/Comment";
 
 interface AnnotatingWorkingAreaProps {
-    imageId: number;
+    currentImage: AnnotationImage;
 }
 
-export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({imageId}) => {
+const createAnnotationFromData = (data: any, tags: Tag[], type: AnnotationType): Annotation => {
+    switch (type) {
+        case AnnotationType.BOUNDING_BOX:
+            return createBBoxFromData(data, tags);
+    }
+    throw 42;
+}
+
+const createBBoxFromData = (data: any, tags: Tag[]) => {
+    return new BoundingBox(
+        data.boundingBox.x1,
+        data.boundingBox.y1,
+        data.boundingBox.x2,
+        data.boundingBox.y2,
+        data.annotationTagId,
+        tags.filter(tag => tag.id === data.annotationTagId)[0].color,
+        data.annotationId);
+}
+
+export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({currentImage}) => {
 
     const projectId = useContext<number>(ProjectContext);
+
     const [isShowQualitySection, setIsShowQualitySection] = useState(true)
-    const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
+    const [annotations, setAnnotations] = useState<Annotation[]>([]);
     const [tags, setTags] = useState<Tag[]>([]);
-    const [currentTag, setCurrentTag] = useState<Tag>()
+    const [currentTag, setCurrentTag] = useState<Tag>();
+    const [currentAnnotation, setCurrentAnnotation] = useState<Annotation>();
+    const [comments, setComments] = useState<Comment[]>(currentImage.comments);
+
+    const handleAnnotationAdd = (annotation: Annotation) => {
+        switch (annotation.annotationType) {
+            case AnnotationType.BOUNDING_BOX:
+                return handleBoundingBoxAdd(annotation as BoundingBox);
+        }
+        throw "Cannot add this annotation";
+    }
+
+    const handleAnnotationUpdate = (annotation: Annotation) => {
+        switch (annotation.annotationType) {
+            case AnnotationType.BOUNDING_BOX:
+                return handleBoundingBoxUpdate(annotation as BoundingBox);
+        }
+        throw "Cannot add this annotation";
+
+    }
 
     const handleBoundingBoxAdd = (bbox: BoundingBox) => {
-        return axios.post(BBOX_ANNOTATIONS_BASE_URL.replace("{imageId}", imageId.toString()), {
+        return axios.post(BBOX_ANNOTATIONS_BASE_URL.replace("{imageId}", currentImage.id!.toString()), {
             annotationTagId: bbox.tagId,
             boundingBox: {
                 x1: bbox.data.xStart,
@@ -42,13 +87,13 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({ima
                 data.annotationTagId,
                 bbox.color,
                 data.annotationId);
-            setBoundingBoxes(prevState => [...prevState, newBoundingBox]);
+            setAnnotations(prevState => [...prevState, newBoundingBox]);
             setCurrentTag(undefined);
         });
     };
 
     const handleBoundingBoxUpdate = (bbox: BoundingBox) => {
-        return axios.put(BBOX_ANNOTATIONS_BASE_URL.replace("{imageId}", imageId.toString()) + "/" + bbox.id!.toString(), {
+        return axios.put(BBOX_ANNOTATIONS_BASE_URL.replace("{imageId}", currentImage.id!.toString()) + "/" + bbox.id!.toString(), {
             boundingBox: {
                 x1: bbox.data.xStart,
                 y1: bbox.data.yStart,
@@ -65,33 +110,11 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({ima
                 data.annotationTagId,
                 bbox.color,
                 data.annotationId);
-            setBoundingBoxes(prevState => prevState.map(
+            setAnnotations(prevState => prevState.map(
                 box => box.id === updatedBox.id ? updatedBox : box
             ));
             setCurrentTag(undefined);
         })
-    }
-
-    const handleTagUpdate = (tag: Tag) => {
-        setBoundingBoxes([...boundingBoxes]);
-    }
-
-    const handleTagRemove = (removedTag: Tag) => {
-        axios.delete(PROJECT_TAGS_BASE_URL + "/" + removedTag.id)
-            .then((res) => {
-                setTags(prevState => prevState.filter(tag => removedTag.id !== tag.id));
-                setBoundingBoxes(prevBoxes => prevBoxes.filter(box => box.tagId !== removedTag.id));
-                if (currentTag && removedTag.id === currentTag.id) {
-                    setCurrentTag(undefined);
-                }
-            });
-    }
-
-    const handleTagAdd = (newTag: Tag) => {
-        axios.post(PROJECT_TAGS_BASE_URL, newTag)
-            .then((res) => {
-                setTags(oldValue => [...oldValue, res.data]);
-            });
     }
 
     const handleTagClick = (tag: Tag) => {
@@ -103,47 +126,55 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({ima
     };
 
     useEffect(() => {
-        axios.get<any[]>(BBOX_ANNOTATIONS_BASE_URL.replace("{imageId}", imageId.toString()))
-            .then(res => res.data).then((boundingBoxes) => {
-            axios.get<Tag[]>(PROJECT_TAGS_BASE_URL).then((res) => {
-                setTags(res.data);
-                setBoundingBoxes(boundingBoxes.map(bbox => new BoundingBox(
-                    bbox.boundingBox.x1,
-                    bbox.boundingBox.y1,
-                    bbox.boundingBox.x2,
-                    bbox.boundingBox.y2,
-                    bbox.annotationTagId,
-                    res.data.filter(tag => tag.id === bbox.annotationTagId)[0].color,
-                    bbox.annotationId)));
-            })
+        axios.get<any[]>(BBOX_ANNOTATIONS_BASE_URL.replace("{imageId}", currentImage.id!.toString()))
+            .then(res => res.data).then((annotations) => {
+            axios.get<Tag[]>(PROJECT_TAGS_BASE_URL.replace("{projectId}", projectId.toString())).then((res) => {
+                const tags = res.data as Tag[];
+                setTags(tags);
+                setAnnotations(annotations.map(annotation => createAnnotationFromData(annotation, tags, AnnotationType.BOUNDING_BOX)));
+            });
         })
-    }, [imageId]);
+    }, [currentImage.id, projectId]);
 
-    useEffect(() => {
-            axios.get<Tag[]>(PROJECT_TAGS_BASE_URL.replace("{projectId}", projectId.toString()))
-                .then((res) => setTags(res.data))
-    }, [projectId])
+    const pickAnnotation = (annotation?: Annotation) => {
+        setCurrentAnnotation(annotation);
+    }
+
+    const handleAddComment = (comment: Comment) => {
+        axios.post(replaceRefs(COMMENTS_BASE_URL, {projectId: projectId, imageId: currentImage.id}), comment)
+            .then(res => setComments(prev => [res.data, ...prev]));
+    }
+
+    const handleResolveComment = (comment: Comment) => {
+        axios.put(replaceRefs(COMMENTS_BASE_URL, {projectId: projectId, imageId: currentImage.id}) + `/${comment.id}/resolve?isResolved=${comment.isResolved}`)
+            .then(() => setComments(prev => prev.map(com => com.id === comment.id ? comment : com)));
+    }
 
     return (
         <div className="annotationWorkingArea">
-            <AnnotatingWorkingAreaHeader/>
-            <div className="annotationWorkingAreaBody">
-                <AnnotationListSideBar imageId={imageId}/>
-                <AnnotatingArea imageId={imageId}
-                                boundingBoxes={boundingBoxes}
-                                onBoundingBoxAdd={handleBoundingBoxAdd}
-                                onBoundingBoxRemove={() => {throw 42}}
-                                onBoundingBoxUpdate={handleBoundingBoxUpdate}
-                                onTagAdd={handleTagAdd}
+            <TagsContext.Provider value={new Map(tags.map(tag => [tag.id!, tag]))}>
+                <CurrentAnnotationContext.Provider value={currentAnnotation}>
+                    <ImageContext.Provider value={currentImage.id!}>
+                        <AnnotatingWorkingAreaHeader/>
+                        <div className="annotationWorkingAreaBody">
+                            <AnnotationListSideBar annotations={annotations}/>
+                            <AnnotatingArea
+                                annotations={annotations}
+                                onAnnotationAdd={handleAnnotationAdd}
+                                onAnnotationRemove={() => {
+                                    throw 42
+                                }}
+                                onAnnotationUpdate={handleAnnotationUpdate}
                                 onTagClick={handleTagClick}
-                                onTagRemove={handleTagRemove}
-                                onTagUpdate={handleTagUpdate}
-                                tags={tags}
                                 currentTag={currentTag}
-                />
-                {isShowQualitySection && <AnnotationQualityRightSidebar imageId={imageId}/>}
-            </div>
-            <AnnotatingWorkingAreaFooter/>
+                                onAnnotationPick={pickAnnotation}
+                            />
+                            {isShowQualitySection && <AnnotationQualityRightSidebar comments={comments} onCommentAdd={handleAddComment} onStatusChange={handleResolveComment}/>}
+                        </div>
+                        <AnnotatingWorkingAreaFooter/>
+                    </ImageContext.Provider>
+                </CurrentAnnotationContext.Provider>
+            </TagsContext.Provider>
         </div>
     )
 }

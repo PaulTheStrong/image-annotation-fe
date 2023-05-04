@@ -5,6 +5,10 @@ import {PROJECT_IMAGES_BASE_URL} from "../../../util/constants";
 import axios from "axios";
 import ProjectContext from "../../../context/ProjectContext";
 import AnnotationImage from "../../../data/AnnotationImage";
+import Dimension2D from "../../../data/Dimension2D";
+import Point from "../../../data/Point";
+import Annotation from "../../../data/Annotation";
+import ImageContext from "../../../context/ImageContext";
 
 enum CanvasState {
     EMPTY_STATE,
@@ -13,36 +17,38 @@ enum CanvasState {
     DRAGGING_ITEM
 }
 
-interface BoundingBoxCanvasProps {
-    imageId: number;
-    boundingBoxes: BoundingBox[];
+interface AnnotationCanvasProps {
+    annotations: Annotation[];
     currentTag?: Tag;
 
-    onBoundingBoxUpdate: (bbox: BoundingBox) => Promise<any>;
-    onBoundingBoxAdd: (bbox: BoundingBox) => Promise<any>;
-    onBoundingBoxRemove: (bbox: BoundingBox) => Promise<any>;
+    onAnnotationUpdate: (annotation: Annotation) => Promise<any>;
+    onAnnotationAdd: (annotation: Annotation) => Promise<any>;
+    onAnnotationRemove: (annotation: Annotation) => Promise<any>;
+
+    onAnnotationPick: (annotation?: Annotation) => void;
 }
 
-export const BoundingBoxCanvas: React.FC<BoundingBoxCanvasProps> = (
+export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = (
     {
-        imageId,
-        boundingBoxes,
+        annotations,
         currentTag,
-        onBoundingBoxAdd,
-        onBoundingBoxUpdate,
-        onBoundingBoxRemove
+        onAnnotationAdd,
+        onAnnotationUpdate,
+        onAnnotationRemove,
+        onAnnotationPick
     }) => {
 
     const projectId = useContext<number>(ProjectContext);
+    const imageId = useContext<number | undefined>(ImageContext);
 
     const imageDataUrl = PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()) + "/" + imageId;
     const backgroundImageUrl = imageDataUrl + "/download";
 
     const [canvasState, setCanvasState] = useState<CanvasState>(CanvasState.EMPTY_STATE);
-    const [startPoint, setStartPoint] = useState({x: 0, y: 0});
-    const [endPoint, setEndPoint] = useState({x: 0, y: 0});
-    const [pickedBoundingBox, setPickedBoundingBox] = useState<BoundingBox>();
-    const [imageSize, setImageSize] = useState({width: 0, height: 0})
+    const [startPoint, setStartPoint] = useState<Point>({x: 0, y: 0});
+    const [endPoint, setEndPoint] = useState<Point>({x: 0, y: 0});
+    const [pickedAnnotation, setPickedAnnotation] = useState<Annotation>();
+    const [imageSize, setImageSize] = useState<Dimension2D>({width: 0, height: 0})
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const handleMouseClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -58,10 +64,11 @@ export const BoundingBoxCanvas: React.FC<BoundingBoxCanvasProps> = (
 
         switch (canvasState) {
             case CanvasState.EMPTY_STATE:
-                for (let box of boundingBoxes) {
+                for (let box of annotations) {
                     if (box.isPointInside(x, y)) {
                         isPicked = true;
-                        setPickedBoundingBox(box);
+                        setPickedAnnotation(box);
+                        onAnnotationPick(box);
                         setCanvasState(CanvasState.PICKED_ITEM)
                         break;
                     }
@@ -79,7 +86,7 @@ export const BoundingBoxCanvas: React.FC<BoundingBoxCanvasProps> = (
                 const height = Math.abs(endPoint.y - startPoint.y);
 
                 if (width > 0 && height > 0) {
-                    onBoundingBoxAdd(new BoundingBox(
+                    onAnnotationAdd(new BoundingBox(
                         Math.min(startPoint.x, endPoint.x),
                         Math.min(startPoint.y, endPoint.y),
                         Math.max(startPoint.x, endPoint.x),
@@ -91,29 +98,31 @@ export const BoundingBoxCanvas: React.FC<BoundingBoxCanvasProps> = (
                 break;
 
             case CanvasState.PICKED_ITEM:
-                if (pickedBoundingBox!.isPointInside(x, y)) {
+                if (pickedAnnotation!.isPointInside(x, y)) {
                     setCanvasState(CanvasState.DRAGGING_ITEM);
                     setStartPoint({x, y});
                     setEndPoint({x, y});
                     return;
                 }
                 isPicked = false;
-                for (let box of boundingBoxes) {
+                for (let box of annotations) {
                     if (box.isPointInside(x, y)) {
                         isPicked = true;
-                        setPickedBoundingBox(box);
+                        setPickedAnnotation(box);
+                        onAnnotationPick(box);
                         setCanvasState(CanvasState.PICKED_ITEM)
                         break;
                     }
                 }
                 if (!isPicked) {
-                    setPickedBoundingBox(undefined);
+                    setPickedAnnotation(undefined);
+                    onAnnotationPick(undefined);
                     setCanvasState(CanvasState.EMPTY_STATE);
                 }
                 break;
 
             case CanvasState.DRAGGING_ITEM:
-                onBoundingBoxUpdate(pickedBoundingBox!).then(() => setCanvasState(CanvasState.PICKED_ITEM));
+                onAnnotationUpdate(pickedAnnotation!).then(() => setCanvasState(CanvasState.PICKED_ITEM));
                 break;
         }
     }
@@ -135,43 +144,10 @@ export const BoundingBoxCanvas: React.FC<BoundingBoxCanvasProps> = (
             case CanvasState.DRAGGING_ITEM:
                 let deltaX = (x - startPoint.x);
                 let deltaY = (y - startPoint.y);
-
-                setPickedBoundingBox(prevBox =>
-                    new BoundingBox(
-                        prevBox!.data.xStart + deltaX,
-                        prevBox!.data.yStart + deltaY,
-                        prevBox!.data.xEnd + deltaX,
-                        prevBox!.data.yEnd + deltaY,
-                        prevBox!.tagId,
-                        prevBox!.color,
-                        prevBox?.id
-                    )
-                );
+                setPickedAnnotation(pickedAnnotation?.moveFigure(deltaX, deltaY));
                 setStartPoint({x, y});
                 break;
         }
-    }
-
-    const drawBox = (context: CanvasRenderingContext2D, boundingBox: BoundingBox) => {
-        const canvasWidth = canvasRef?.current?.width ?? 0;
-        const canvasHeight = canvasRef?.current?.height ?? 0;
-
-        const imageWidth = imageSize.width;
-        const imageHeight = imageSize.height;
-
-        let color = boundingBox.color;
-        let width = Math.abs(boundingBox.data.xEnd - boundingBox.data.xStart) / imageWidth * canvasWidth;
-        let height = Math.abs(boundingBox.data.yEnd - boundingBox.data.yStart) / imageHeight * canvasHeight;
-        let x = Math.min(boundingBox.data.xStart, boundingBox.data.xEnd) / imageWidth * canvasWidth;
-        let y = Math.min(boundingBox.data.yStart, boundingBox.data.yEnd) / imageHeight * canvasHeight;
-
-        context.globalAlpha = 1;
-        context.strokeStyle = color;
-        context.lineWidth = boundingBox.id === pickedBoundingBox?.id ? 2 : 1;
-        context.strokeRect(x, y, width, height);
-        context.fillStyle = color;
-        context.globalAlpha = 0.2;
-        context.fillRect(x, y, width, height);
     }
 
     React.useEffect(() => {
@@ -181,26 +157,26 @@ export const BoundingBoxCanvas: React.FC<BoundingBoxCanvasProps> = (
         const context = canvas.getContext("2d");
         if (!context) return;
 
+        const canvasWidth = canvasRef?.current?.width ?? 0;
+        const canvasHeight = canvasRef?.current?.height ?? 0;
+        const canvasSize = {width: canvasWidth, height: canvasHeight};
+
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        for (const boundingBox of boundingBoxes) {
-            if (boundingBox.id !== pickedBoundingBox?.id) {
-                drawBox(context, boundingBox);
+        for (const annotation of annotations) {
+            if (annotation.id !== pickedAnnotation?.id) {
+                annotation.drawFigure(context, canvasSize, imageSize, false);
             } else {
-                drawBox(context, pickedBoundingBox!);
+                pickedAnnotation!.drawFigure(context, canvasSize, imageSize, true);
             }
         }
+
         if (canvasState === CanvasState.DRAWING) {
-            drawBox(context, new BoundingBox(
-                startPoint.x,
-                startPoint.y,
-                endPoint.x,
-                endPoint.y,
-                currentTag!.id!,
-                currentTag!.color))
+            new BoundingBox(startPoint.x, startPoint.y, endPoint.x, endPoint.y, currentTag!.id!, currentTag!.color)
+                .drawFigure(context, canvasSize, imageSize, true);
         }
 
-    }, [boundingBoxes, canvasState, pickedBoundingBox, startPoint, endPoint, drawBox, currentTag, imageSize.width, imageSize.height]);
+    }, [annotations, canvasState, pickedAnnotation, startPoint, endPoint, currentTag, imageSize.width, imageSize.height, imageSize]);
 
     useEffect(() => {
         axios.get<AnnotationImage>(imageDataUrl)

@@ -22,7 +22,7 @@ export const PreviewAnnotationImageTable: React.FC<PreviewAnnotationImageTablePr
                 <div className="imageTablePreview">Name</div>
             </div>
             {annotationImages.map(image => (
-                <PreviewAnnotationImageTableRow imageData={image} onImageRowClick={onImageRowClick}/>
+                <PreviewAnnotationImageTableRow imageData={image} onImageRowClick={onImageRowClick} key={image.id}/>
             ))}
         </div>
     );

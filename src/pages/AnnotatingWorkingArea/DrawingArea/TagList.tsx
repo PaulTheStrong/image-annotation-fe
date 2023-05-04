@@ -11,17 +11,22 @@ interface TagListProps {
 
 export const TagList: React.FC<TagListProps> = ({onTagClick, tags, currentTagId}) => {
 
+    let showId = 0;
+
     return (
         <div style={{display: "flex", flexWrap: "wrap", flexDirection: "row"}}>
-            {tags.map((tag) => (
-                <TagLabel
-                    key={tag.color}
-                    tag={tag}
-                    onClick={onTagClick}
-                    mode={TagLabelMode.ANNOTATING}
-                    isPicked={currentTagId === tag.id}
-                />
-            ))}
+            {tags.map((tag) => {
+                return (
+                    <TagLabel
+                        key={tag.color}
+                        tag={tag}
+                        onClick={onTagClick}
+                        mode={TagLabelMode.ANNOTATING}
+                        isPicked={currentTagId === tag.id}
+                        showId={++showId}
+                    />
+                )
+            })}
         </div>
     );
 };

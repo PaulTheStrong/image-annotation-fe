@@ -9,7 +9,6 @@ interface TagListEditorProps {
     onTagUpdate: (tag: Tag) => void;
     onTagRemove: (tag: Tag) => void;
     tags: Tag[];
-    currentTagId: number | undefined;
 }
 
 export const TagListEditor: React.FC<TagListEditorProps> = (
@@ -19,9 +18,9 @@ export const TagListEditor: React.FC<TagListEditorProps> = (
         onTagUpdate,
         onTagRemove,
         tags,
-        currentTagId
     }) => {
     const [newTagName, setNewTagName] = useState('');
+    const [currentTagId, setCurrentTagId] = useState<number>();
 
     const handleAddTag = () => {
         if (newTagName.trim() === '') return;
@@ -33,16 +32,28 @@ export const TagListEditor: React.FC<TagListEditorProps> = (
         setNewTagName('');
     };
 
+    const handleTagClick = (tag: Tag) => {
+        setCurrentTagId(tag.id);
+        if (onTagClick) onTagClick(tag);
+    }
+
+    let showId = 0;
     return (
         <div style={{margin: 10}}>
             <div style={{display: "flex", flexWrap: "wrap", alignContent: "stretch", flexDirection: "column"}}>
-                {tags.map((tag) => (
-                    <TagLabel key={tag.color} tag={tag} onClick={onTagClick} mode={TagLabelMode.EDITING}
-                              onUpdateColor={(newColor) => {
-                                  tag.color = newColor;
-                                  onTagUpdate(tag);
-                              }} onTagRemove={onTagRemove} isPicked={currentTagId === tag.id}/>
-                ))}
+                {
+                    tags.map((tag) => {
+                    return (
+                        <TagLabel key={tag.color} tag={tag} onClick={handleTagClick} mode={TagLabelMode.EDITING}
+                                  onUpdateColor={(newColor) => {
+                                      tag.color = newColor;
+                                      onTagUpdate(tag);
+                                  }}
+                                  onTagRemove={onTagRemove}
+                                  isPicked={currentTagId === tag.id}
+                                  showId={++showId}/>
+                    )
+                })}
             </div>
             <div className="tag-add">
                 <input type="text" placeholder="Название тэга" value={newTagName}

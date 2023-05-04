@@ -1,10 +1,9 @@
-import React, {createRef, useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import AnnotationImage from "../../data/AnnotationImage";
 import {PreviewAnnotationImageTable} from "./PreviewAnnotationImageTable";
 import axios from "axios";
 import {PROJECT_IMAGES_BASE_URL} from "../../util/constants";
 import ProjectContext from "../../context/ProjectContext";
-import {BoundingBoxCanvas} from "../AnnotatingWorkingArea/DrawingArea/BoundingBoxCanvas";
 import {AnnotatingWorkingArea} from "../AnnotatingWorkingArea/AnnotatingWorkingArea";
 
 interface ProjectViewPageProps {
@@ -13,7 +12,7 @@ interface ProjectViewPageProps {
 export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
 
     const projectId = useContext(ProjectContext);
-    const [annotationImages, setAnnotationImages] = useState<AnnotationImage[]>([]);
+    const [annotationImages, setAnnotationImages] = useState<Map<number, AnnotationImage>>(new Map());
     const [currentImageId, setCurrentImageId] = useState<number>();
 
     const previewAnnotationImageTableRef = useRef<HTMLDivElement>(null);
@@ -21,7 +20,9 @@ export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
 
     useEffect(() => {
         axios.get<AnnotationImage[]>(PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()))
-            .then(res => setAnnotationImages(res.data));
+            .then(res => setAnnotationImages(
+                new Map(res.data.map(img => [img.id!, img]))
+            ));
     }, [projectId])
 
     const onCurrentImageChange = (newImageId: number) => {
@@ -35,7 +36,6 @@ export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
             drawAreaRef?.current?.classList.add("drawAreaCanvasNonPicked")
             previewAnnotationImageTableRef?.current?.classList.remove("previewAnnotationImageTableImagePicked");
             drawAreaRef?.current?.classList.remove("drawAreaCanvasPicked");
-
         } else {
             setCurrentImageId(newImageId)
         }
@@ -44,10 +44,11 @@ export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
     return (
         <div className="projectViewPage">
             <div ref={previewAnnotationImageTableRef} className="previewAnnotationImageTableImageNonPicked">
-                <PreviewAnnotationImageTable annotationImages={annotationImages} onImageRowClick={onCurrentImageChange}/>
+                <PreviewAnnotationImageTable annotationImages={Array.from(annotationImages.values())}
+                                             onImageRowClick={onCurrentImageChange}/>
             </div>
             <div ref={drawAreaRef} className="drawAreaCanvasNonPicked">
-                {currentImageId && <AnnotatingWorkingArea key={currentImageId} imageId={currentImageId!} />}
+                {currentImageId && (<AnnotatingWorkingArea key={currentImageId} currentImage={annotationImages.get(currentImageId)!} />)}
             </div>
         </div>
     );

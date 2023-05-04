@@ -1,3 +1,7 @@
 export enum AnnotationType {
-    CLASSIFICATION, BOUNDING_BOX, POLYGON, KEY_POINTS, SEMANTIC_SEGMENTATION
+    CLASSIFICATION = "Classification",
+    BOUNDING_BOX = "Bounding box",
+    POLYGON = "Polygon",
+    KEY_POINTS = "Keypoint",
+    SEMANTIC_SEGMENTATION = "Semantic"
 }
