@@ -1,0 +1,12 @@
+.tagOuter {
+    border-radius: 5px;
+    font-size: 16px;
+    border-width: 1px;
+    height: 24px;
+    display: flex;
+    flex-direction: row;
+}
+
+.tagListEditor {
+    margin: 10px 0;
+}

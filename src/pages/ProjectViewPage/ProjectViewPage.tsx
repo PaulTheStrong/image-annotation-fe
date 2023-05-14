@@ -1,17 +1,17 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import AnnotationImage from "../../data/AnnotationImage";
 import {PreviewAnnotationImageTable} from "./PreviewAnnotationImageTable";
 import axios from "axios";
 import {PROJECT_IMAGES_BASE_URL} from "../../util/constants";
-import ProjectContext from "../../context/ProjectContext";
 import {AnnotatingWorkingArea} from "../AnnotatingWorkingArea/AnnotatingWorkingArea";
+import {useParams} from "react-router-dom";
 
 interface ProjectViewPageProps {
 }
 
 export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
 
-    const projectId = useContext(ProjectContext);
+    const projectId = Number(useParams<{projectId: string}>().projectId);
     const [annotationImages, setAnnotationImages] = useState<Map<number, AnnotationImage>>(new Map());
     const [currentImageId, setCurrentImageId] = useState<number>();
 

@@ -1,7 +1,7 @@
 import AnnotationImage from "../../data/AnnotationImage";
-import React, {useContext} from "react";
+import React from "react";
 import {PROJECT_IMAGES_BASE_URL} from "../../util/constants";
-import ProjectContext from "../../context/ProjectContext";
+import {useParams} from "react-router-dom";
 
 interface PreviewAnnotationImageTableProps {
     imageData: AnnotationImage;
@@ -10,7 +10,7 @@ interface PreviewAnnotationImageTableProps {
 
 export const PreviewAnnotationImageTableRow: React.FC<PreviewAnnotationImageTableProps> = ({imageData, onImageRowClick}) => {
 
-    const projectId = useContext<number>(ProjectContext);
+    const projectId = Number(useParams<{projectId: string}>().projectId);
 
     const imageSrc = PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()) + "/" + imageData.id + "/downloadPreview";
 

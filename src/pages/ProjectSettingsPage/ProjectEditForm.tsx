@@ -1,8 +1,15 @@
-import React from "react";
+import React, {useState} from "react";
 
 interface ProjectEditFormProps {
 }
 
 export const ProjectEditForm: React.FC<ProjectEditFormProps> = () => {
-    return (<> </>)
+    const [projectName, setProjectName] = useState<string>();
+    const [projectDescription, setProjectDescription] = useState<string>();
+
+    return (
+        <>
+
+        </>
+    )
 }

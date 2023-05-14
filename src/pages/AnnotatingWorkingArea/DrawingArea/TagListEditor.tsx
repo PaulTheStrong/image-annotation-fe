@@ -33,17 +33,21 @@ export const TagListEditor: React.FC<TagListEditorProps> = (
     };
 
     const handleTagClick = (tag: Tag) => {
-        setCurrentTagId(tag.id);
+        if (currentTagId == null || currentTagId !== tag.id) {
+            setCurrentTagId(tag.id);
+        } else {
+            setCurrentTagId(undefined);
+        }
         if (onTagClick) onTagClick(tag);
     }
 
     let showId = 0;
     return (
-        <div style={{margin: 10}}>
+        <div className="tagListEditor">
+            <label>Add tags to your project</label>
             <div style={{display: "flex", flexWrap: "wrap", alignContent: "stretch", flexDirection: "column"}}>
                 {
-                    tags.map((tag) => {
-                    return (
+                    tags.map((tag) =>
                         <TagLabel key={tag.color} tag={tag} onClick={handleTagClick} mode={TagLabelMode.EDITING}
                                   onUpdateColor={(newColor) => {
                                       tag.color = newColor;
@@ -53,12 +57,12 @@ export const TagListEditor: React.FC<TagListEditorProps> = (
                                   isPicked={currentTagId === tag.id}
                                   showId={++showId}/>
                     )
-                })}
+                }
             </div>
             <div className="tag-add">
-                <input type="text" placeholder="Название тэга" value={newTagName}
+                <input type="text" placeholder="Enter new tag name" value={newTagName}
                        onChange={(e) => setNewTagName(e.target.value)}/>
-                <button onClick={handleAddTag}>Добавить</button>
+                <button onClick={handleAddTag} className="btn">Add new tag</button>
             </div>
         </div>
     );

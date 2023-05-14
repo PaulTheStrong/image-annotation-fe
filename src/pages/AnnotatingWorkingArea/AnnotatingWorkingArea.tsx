@@ -16,6 +16,7 @@ import CurrentAnnotationContext from "../../context/CurrentAnnotationContext";
 import ImageContext from "../../context/ImageContext";
 import AnnotationImage from "../../data/AnnotationImage";
 import Comment from "../../data/Comment";
+import {useParams} from "react-router-dom";
 
 interface AnnotatingWorkingAreaProps {
     currentImage: AnnotationImage;
@@ -42,9 +43,8 @@ const createBBoxFromData = (data: any, tags: Tag[]) => {
 
 export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({currentImage}) => {
 
-    const projectId = useContext<number>(ProjectContext);
+    const projectId = Number(useParams<{projectId: string}>().projectId);
 
-    const [isShowQualitySection, setIsShowQualitySection] = useState(true)
     const [annotations, setAnnotations] = useState<Annotation[]>([]);
     const [tags, setTags] = useState<Tag[]>([]);
     const [currentTag, setCurrentTag] = useState<Tag>();
@@ -169,7 +169,7 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({cur
                                 currentTag={currentTag}
                                 onAnnotationPick={pickAnnotation}
                             />
-                            {isShowQualitySection && <AnnotationQualityRightSidebar comments={comments} onCommentAdd={handleAddComment} onStatusChange={handleResolveComment}/>}
+                            <AnnotationQualityRightSidebar comments={comments} onCommentAdd={handleAddComment} onStatusChange={handleResolveComment}/>
                         </div>
                         <AnnotatingWorkingAreaFooter/>
                     </ImageContext.Provider>

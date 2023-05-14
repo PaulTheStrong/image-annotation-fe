@@ -1,0 +1,53 @@
+.projectSelectPage {
+    width: 100%;
+    height: calc(100vh - 40px);
+    text-decoration: none;
+    padding: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 40px;
+    row-gap: 10px;
+    justify-content: flex-start;
+    overflow-y: scroll;
+}
+
+.projectSelectCard {
+    width: 350px;
+    height: 200px;
+    border: 2px solid black;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 20px;
+    transition: 0.3s ease-in-out;
+    text-decoration: none;
+    color: black;
+}
+
+.projectSelectCard > p {
+    font-size: 18px;
+}
+
+.projectSelectCard > h2 {
+    text-align: center;
+}
+
+.projectSelectCard:hover {
+    background-color: #f2f2f2;
+    cursor: pointer;
+}
+
+.createProjectCard {
+    flex-direction: column;
+    text-decoration: none;
+}
+
+.createProjectCard img {
+    width: 100px;
+    margin: 20px auto;
+    display: block;
+}
+
+.createProjectCard h2 {
+    font-size: 20px;
+    text-align: center;
+}

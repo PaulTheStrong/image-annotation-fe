@@ -25,10 +25,8 @@ export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor,
     let borderRadius = 3;
 
     const toggleHover = () => {
-        if (mode === TagLabelMode.ANNOTATING) {
-            colorPadWrapperRef.current?.classList?.toggle("tagColorPadHover");
-            colorPadWrapperRef.current?.classList?.toggle("tagColorPadNonHover");
-        }
+        colorPadWrapperRef.current?.classList?.toggle("tagColorPadHover");
+        colorPadWrapperRef.current?.classList?.toggle("tagColorPadNonHover");
     }
 
     const handleOnClick = () => {
@@ -40,12 +38,7 @@ export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor,
     }
 
     const tagOuterStyle = {
-        display: "flex",
-        borderRadius: borderRadius,
         backgroundColor: tag.color + opacity,
-        fontSize: 16,
-        borderWidth: 1,
-        height: 24,
         color: textColor
     };
 
@@ -57,15 +50,17 @@ export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor,
     };
 
     return (
-        <div style={{margin: 5, position: "relative"}}>
+        <div style={{position: "relative", marginBottom: 10}}>
             {isPicked && mode === TagLabelMode.EDITING && (
                 <HexColorPicker
                     color={color}
                     onChange={handleSetColor}
                     style={{position: "absolute", top: 30, left: 20, zIndex: 2}}
-                    onBlur={() => { if (onUpdateColor) onUpdateColor(color); }}/>
+                    onBlur={() => {
+                        if (onUpdateColor) onUpdateColor(color);
+                    }}/>
             )}
-            <div style={tagOuterStyle} onMouseEnter={toggleHover} onMouseLeave={toggleHover}>
+            <div className="tagOuter" onMouseEnter={toggleHover} onMouseLeave={toggleHover} style={tagOuterStyle}>
                 <div ref={colorPadWrapperRef} style={colorPadStyle} className="tagColorPadNonHover"></div>
                 <div className="tag"
                      style={{
@@ -79,7 +74,9 @@ export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor,
                     {showId}
                 </div>
                 {mode === TagLabelMode.EDITING && (
-                    <img style={{width: "inherit"}} src={cross} onClick={() => { if (onTagRemove) onTagRemove(tag)}}  alt=""/>
+                    <img style={{height: "inherit"}} src={cross} onClick={() => {
+                        if (onTagRemove) onTagRemove(tag)
+                    }} alt=""/>
                 )}
             </div>
         </div>

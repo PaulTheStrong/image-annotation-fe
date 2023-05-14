@@ -3,23 +3,19 @@ import {BoundingBox} from "./BoundingBox";
 import Tag from "../../../data/Tag";
 import {PROJECT_IMAGES_BASE_URL} from "../../../util/constants";
 import axios from "axios";
-import ProjectContext from "../../../context/ProjectContext";
 import AnnotationImage from "../../../data/AnnotationImage";
 import Dimension2D from "../../../data/Dimension2D";
 import Point from "../../../data/Point";
 import Annotation from "../../../data/Annotation";
 import ImageContext from "../../../context/ImageContext";
-
-enum CanvasState {
-    EMPTY_STATE,
-    DRAWING,
-    PICKED_ITEM,
-    DRAGGING_ITEM
-}
+import {useParams} from "react-router-dom";
+import {AnnotationType} from "../../../data/AnnotatoinType";
+import {CanvasState} from "./StateStrategy";
 
 interface AnnotationCanvasProps {
     annotations: Annotation[];
     currentTag?: Tag;
+    currentAnnotationType?: AnnotationType;
 
     onAnnotationUpdate: (annotation: Annotation) => Promise<any>;
     onAnnotationAdd: (annotation: Annotation) => Promise<any>;
@@ -32,13 +28,14 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = (
     {
         annotations,
         currentTag,
+        currentAnnotationType,
         onAnnotationAdd,
         onAnnotationUpdate,
         onAnnotationRemove,
         onAnnotationPick
     }) => {
 
-    const projectId = useContext<number>(ProjectContext);
+    const projectId = Number(useParams<{projectId: string}>().projectId);
     const imageId = useContext<number | undefined>(ImageContext);
 
     const imageDataUrl = PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()) + "/" + imageId;
@@ -50,6 +47,23 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = (
     const [pickedAnnotation, setPickedAnnotation] = useState<Annotation>();
     const [imageSize, setImageSize] = useState<Dimension2D>({width: 0, height: 0})
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const handleBBoxMouseEvent = (event: React.MouseEvent<HTMLCanvasElement>) => {
+
+    }
+
+    const handleMouseEvent = (event: React.MouseEvent<HTMLCanvasElement>) => {
+        switch (currentAnnotationType) {
+            case AnnotationType.BOUNDING_BOX:
+                handleBBoxMouseEvent(event);
+                break;
+            case AnnotationType.POLYGON:
+
+                break;
+            default:
+                break;
+        }
+    }
 
     const handleMouseClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = canvasRef.current;

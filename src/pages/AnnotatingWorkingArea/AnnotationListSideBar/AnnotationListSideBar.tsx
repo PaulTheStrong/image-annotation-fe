@@ -21,7 +21,7 @@ export const AnnotationListSideBar: React.FC<AnnotationListSideBarProps> = ({ann
                     case AnnotationType.BOUNDING_BOX:
                         return <BoundingBoxAnnotationListItem bbox={annotation as BoundingBox} isActive={pickedAnnotation?.id === annotation.id} showId={++id} key={annotation.id}/>
                 }
-                throw 42;
+                throw new Error(`Annotation type ${annotation.annotationType} is not supported`);
             })}
         </div>
     )

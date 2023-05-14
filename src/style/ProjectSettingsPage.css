@@ -1,0 +1,33 @@
+.projectSettingsPage {
+    width: 50%;
+    height: calc(100vh - 40px);
+    margin: 10px auto;
+    overflow-y: scroll;
+}
+
+.projectSettingsPage * {
+    display: block;
+    font-size: 18px;
+}
+
+.projectSettingsPage label {
+}
+
+.projectSettingsPage input {
+    width: 100%;
+    height: var(--inputHeight);
+    font-size: 18px;
+    padding: 5px;
+    margin-bottom: 15px;
+}
+
+.projectSettingsPage button {
+    width: 100%;
+    height: var(--inputHeight);
+    margin-top: 10px;
+}
+
+.projectSettingsPageFormContainer {
+    display: flex;
+    width: 100%;
+}
