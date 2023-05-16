@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import {BoundingBox} from "../DrawingArea/BoundingBox";
+import {BoundingBox} from "../../../data/BoundingBox";
 import TagsContext from "../../../context/TagsContext";
 
 interface BoundingBoxAnnotationListItemProps {

@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 
 interface PreviewAnnotationImageTableProps {
     imageData: AnnotationImage;
-    onImageRowClick?: (annotationImage: number) => void;
+    onImageRowClick?: (annotationImage: string) => void;
 }
 
 export const PreviewAnnotationImageTableRow: React.FC<PreviewAnnotationImageTableProps> = ({imageData, onImageRowClick}) => {

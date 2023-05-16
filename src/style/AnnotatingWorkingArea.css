@@ -17,8 +17,37 @@
 .annotatingWorkingAreaHeader {
     padding-left: 10px;
     width: 100%;
+    height: 100%;
     background-color: #f2f2f2;
     border-bottom: 3px solid gainsboro;
+    display: flex;
+    justify-content: center; /* center items horizontally */
+    align-items: center; /* center items vertically */
+    column-gap: 10px;
+}
+
+.headerBtn {
+    width: 25px;
+    height: 25px;
+}
+
+.headerBtn > img {
+    width: 100%;
+}
+
+.headerBtn:hover {
+    background-color: #cccccc;
+    cursor: pointer;
+}
+
+.headerBtnActive {
+    background-color: #cccccc;
+}
+
+.annotationWorkingAreaHeader img {
+    height: 100%;
+    width: auto;
+    display: block;
 }
 
 .annotationWorkingAreaBody {
@@ -33,9 +62,8 @@
     width: 100%;
 }
 
-.annotationWorkingAreaCanvasContainer > canvas {
+.annotationWorkingAreaCanvasContainer canvas {
     display: block;
-    width: 100%;
     background-repeat: no-repeat;
     background-size: contain;
 }

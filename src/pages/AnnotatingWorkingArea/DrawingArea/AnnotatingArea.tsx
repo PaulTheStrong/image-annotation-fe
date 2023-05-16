@@ -4,10 +4,12 @@ import Tag from "../../../data/Tag";
 import {AnnotationCanvas} from "./AnnotationCanvas";
 import Annotation from "../../../data/Annotation";
 import tagsContext from "../../../context/TagsContext";
+import {AnnotationType} from "../../../data/AnnotatoinType";
 
 interface AnnotatingAreaProps {
     annotations: Annotation[];
     currentTag?: Tag;
+    currentAnnotationType?: AnnotationType;
 
     onTagClick: (tag: Tag) => void;
 
@@ -21,6 +23,7 @@ export const AnnotatingArea: React.FC<AnnotatingAreaProps> = (
     {
         annotations,
         currentTag,
+        currentAnnotationType,
 
         onTagClick,
 
@@ -35,6 +38,7 @@ export const AnnotatingArea: React.FC<AnnotatingAreaProps> = (
     return (
         <div className="annotationWorkingAreaCanvasContainer">
             <AnnotationCanvas annotations={annotations}
+                              currentAnnotationType={currentAnnotationType}
                               onAnnotationUpdate={onAnnotationUpdate}
                               onAnnotationRemove={onAnnotationRemove}
                               onAnnotationAdd={onAnnotationAdd}

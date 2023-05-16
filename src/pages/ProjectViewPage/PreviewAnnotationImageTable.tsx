@@ -4,7 +4,7 @@ import {PreviewAnnotationImageTableRow} from "./PreviewAnnotationImageTableRow";
 
 interface PreviewAnnotationImageTableProps {
     annotationImages: AnnotationImage[];
-    onImageRowClick?: (annotationImage: number) => void;
+    onImageRowClick?: (annotationImage: string) => void;
 }
 
 export const PreviewAnnotationImageTable: React.FC<PreviewAnnotationImageTableProps> = ({

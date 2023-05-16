@@ -100,8 +100,6 @@ html, body, .App, #root, .projectViewPage {
 
 .previewAnnotationImageTableImageNonPicked {
   width: 100%;
-  transition: width 0.2s ease-in-out;
-
 }
 
 .previewAnnotationImageTableImagePicked {
@@ -111,7 +109,6 @@ html, body, .App, #root, .projectViewPage {
 .drawAreaCanvasPicked {
   width: 70%;
   transform: translateX(0%);
-  transition: transform 0.2s ease-in-out;
 }
 
 .drawAreaCanvasNonPicked {

@@ -12,8 +12,8 @@ interface ProjectViewPageProps {
 export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
 
     const projectId = Number(useParams<{projectId: string}>().projectId);
-    const [annotationImages, setAnnotationImages] = useState<Map<number, AnnotationImage>>(new Map());
-    const [currentImageId, setCurrentImageId] = useState<number>();
+    const [annotationImages, setAnnotationImages] = useState<Map<string, AnnotationImage>>(new Map());
+    const [currentImageId, setCurrentImageId] = useState<string>();
 
     const previewAnnotationImageTableRef = useRef<HTMLDivElement>(null);
     const drawAreaRef = useRef<HTMLDivElement>(null);
@@ -25,7 +25,7 @@ export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
             ));
     }, [projectId])
 
-    const onCurrentImageChange = (newImageId: number) => {
+    const onCurrentImageChange = (newImageId: string) => {
         if (currentImageId == null) {
             setCurrentImageId(newImageId);
             previewAnnotationImageTableRef?.current?.classList.add("previewAnnotationImageTableImagePicked");

@@ -1,6 +1,6 @@
-import Annotation from "../../../data/Annotation";
-import {AnnotationType} from "../../../data/AnnotatoinType";
-import Dimension2D from "../../../data/Dimension2D";
+import Annotation from "./Annotation";
+import {AnnotationType} from "./AnnotatoinType";
+import Dimension2D from "./Dimension2D";
 
 export class BoundingBox implements Annotation {
     id?: number;
@@ -52,7 +52,6 @@ export class BoundingBox implements Annotation {
     }
 
     drawFigure(context: CanvasRenderingContext2D, canvasSize: Dimension2D, imageSize: Dimension2D, isPicked: boolean) {
-
         const canvasWidth = canvasSize.width;
         const canvasHeight = canvasSize.height;
 
@@ -73,5 +72,77 @@ export class BoundingBox implements Annotation {
         context.fillStyle = color;
         context.globalAlpha = 0.2;
         context.fillRect(x, y, width, height);
+
+        context.globalAlpha = 1;
+        context.beginPath();
+        context.arc(x, y, this.radius, 0, 2 * Math.PI);
+        context.stroke()
+        context.closePath()
+        context.beginPath()
+        context.arc(x + width, y, this.radius, 0, 2 * Math.PI);
+        context.stroke()
+        context.closePath();
+        context.beginPath();
+        context.arc(x, y + height, this.radius, 0, 2 * Math.PI);
+        context.stroke()
+        context.closePath()
+        context.beginPath();
+        context.arc(x +width, y + height, this.radius, 0, 2 * Math.PI);
+        context.stroke()
     }
+
+    private readonly radius = 5;
+
+    getPoint(x: number, y: number): number | undefined {
+        const xStart = this.data.xStart;
+        const xEnd = this.data.xEnd;
+        const yStart = this.data.yStart;
+        const yEnd = this.data.yEnd;
+        if (Math.abs(xStart - x) < this.radius && Math.abs(yStart - y) < this.radius) {
+            return 0;
+        } else if (Math.abs(xEnd - x) < this.radius && Math.abs(yStart - y) < this.radius) {
+            return 1;
+        } else if (Math.abs(xStart - x) < this.radius && Math.abs(yEnd - y) < this.radius) {
+            return 2;
+        } else if (Math.abs(xEnd - x) < this.radius && Math.abs(yEnd - y) < this.radius) {
+            return 3;
+        }
+    }
+
+    movePoint(deltaX: number, deltaY: number, point: number): Annotation {
+        let xStart = this.data.xStart;
+        let xEnd = this.data.xEnd;
+        let yStart = this.data.yStart;
+        let yEnd = this.data.yEnd;
+
+        switch (point) {
+            case 0:
+                xStart += deltaX;
+                yStart += deltaY;
+                break;
+            case 1:
+                xEnd += deltaX;
+                yStart += deltaY;
+                break;
+            case 2:
+                xStart += deltaX;
+                yEnd += deltaY;
+                break;
+            case 3:
+                xEnd += deltaX;
+                yEnd += deltaY;
+                break;
+        }
+        return new BoundingBox(
+            xStart,
+            yStart,
+            xEnd,
+            yEnd,
+            this.tagId,
+            this.color,
+            this.id
+        )
+    }
+
+
 }
