@@ -27,7 +27,8 @@ enum MouseEventType {
     CLICK, MOVE
 }
 
-export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
+export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = (
+    {
         annotations,
         currentTag,
         currentAnnotationType,
@@ -64,7 +65,7 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
         }
     }, [canvasState, pickedAnnotation, currentAnnotationType])
 
-    const handleBBoxMouseEvent = (event: React.MouseEvent<HTMLCanvasElement>, eventType: MouseEventType) => {
+    const handleBBoxMouseEvent = async (event: React.MouseEvent<HTMLCanvasElement>, eventType: MouseEventType) => {
         const canvas = canvasRef.current!;
         const rect = canvas.getBoundingClientRect();
 
@@ -85,17 +86,16 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
                 if (eventType === MouseEventType.MOVE) {
                     let deltaX = (x - startPoint.x);
                     let deltaY = (y - startPoint.y);
-                    if (pickedPoint) {
+                    if (pickedPoint !== undefined) {
                         setPickedAnnotation(pickedAnnotation?.movePoint(deltaX, deltaY, pickedPoint));
                     } else {
                         setPickedAnnotation(pickedAnnotation?.moveFigure(deltaX, deltaY));
                     }
                     setStartPoint({x, y});
                 } else if (eventType === MouseEventType.CLICK) {
-                    onAnnotationUpdate(pickedAnnotation!).then(() => {
-                        setCanvasState(CanvasState.PICKED_ITEM);
-                        setPickedPoint(undefined);
-                    });
+                    await onAnnotationUpdate(pickedAnnotation!);
+                    setCanvasState(CanvasState.PICKED_ITEM);
+                    setPickedPoint(undefined);
                 }
                 break;
             case CanvasState.PICKED_ITEM:
@@ -105,8 +105,7 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
                         setPickedPoint(pt);
                         setCanvasState(CanvasState.DRAGGING_ITEM);
                         setStartPoint({x, y});
-                    }
-                    else if (pickedAnnotation!.isPointInside(x, y)) {
+                    } else if (pickedAnnotation!.isPointInside(x, y)) {
                         setCanvasState(CanvasState.DRAGGING_ITEM);
                         setStartPoint({x, y});
                         return;
@@ -121,14 +120,15 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
                     const height = Math.abs(endPoint.y - startPoint.y);
 
                     if (width > 0 && height > 0) {
-                        onAnnotationAdd(new BoundingBox(
+                        await onAnnotationAdd(new BoundingBox(
                             Math.min(startPoint.x, endPoint.x),
                             Math.min(startPoint.y, endPoint.y),
                             Math.max(startPoint.x, endPoint.x),
                             Math.max(startPoint.y, endPoint.y),
                             currentTag!.id!,
                             currentTag!.color,
-                        )).then(() => setCanvasState(CanvasState.EMPTY_STATE));
+                        ));
+                        setCanvasState(CanvasState.EMPTY_STATE);
                     }
                 } else if (eventType === MouseEventType.MOVE) {
                     setEndPoint({x, y});
@@ -160,7 +160,7 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
                 if (eventType === MouseEventType.MOVE) {
                     let deltaX = (x - startPoint.x);
                     let deltaY = (y - startPoint.y);
-                    if (pickedPoint) {
+                    if (pickedPoint !== undefined) {
                         setPickedAnnotation(pickedAnnotation?.movePoint(deltaX, deltaY, pickedPoint));
                     } else {
                         setPickedAnnotation(pickedAnnotation?.moveFigure(deltaX, deltaY));
@@ -180,8 +180,7 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
                         setPickedPoint(pt);
                         setCanvasState(CanvasState.DRAGGING_ITEM);
                         setStartPoint({x, y});
-                    }
-                    else if (pickedAnnotation!.isPointInside(x, y)) {
+                    } else if (pickedAnnotation!.isPointInside(x, y)) {
                         setCanvasState(CanvasState.DRAGGING_ITEM);
                         setStartPoint({x, y});
                         return;
@@ -310,7 +309,7 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
     }, [annotations, canvasState, currentAnnotationType, currentTag, endPoint, imageSize, pickedAnnotation, polygonPoints, startPoint]);
 
     const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
-        const { naturalWidth, naturalHeight } = event.currentTarget;
+        const {naturalWidth, naturalHeight} = event.currentTarget;
         const imageWidth = naturalWidth;
         const imageHeight = naturalHeight;
 

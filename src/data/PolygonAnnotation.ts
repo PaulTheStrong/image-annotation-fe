@@ -56,7 +56,7 @@ export class PolygonAnnotation implements Annotation {
         )
     }
 
-    private readonly radius = 5;
+    private readonly radius = 4;
 
     drawFigure(context: CanvasRenderingContext2D, canvasSize: Dimension2D, imageSize: Dimension2D, isPicked: boolean) {
         const canvasWidth = canvasSize.width;
@@ -101,7 +101,7 @@ export class PolygonAnnotation implements Annotation {
 
     getPoint(x: number, y: number): number | undefined {
         for (let i = 0; i < this.data.points.length; i++) {
-            if (Math.abs(this.data.points[i].x - x) < this.radius && Math.abs(this.data.points[i].y - y) < this.radius)
+            if (Math.abs(this.data.points[i].x - x) < this.radius * 2 && Math.abs(this.data.points[i].y - y) < this.radius * 2)
                 return i;
         }
     }

@@ -1,4 +1,4 @@
-const HOST = "http://localhost:8080";
+export const HOST = "http://localhost:8080";
 
 export const PROJECT_TAGS_BASE_URL = HOST + "/projects/{projectId}/tags";
 export const PROJECT_IMAGES_BASE_URL = HOST + "/projects/{projectId}/images";

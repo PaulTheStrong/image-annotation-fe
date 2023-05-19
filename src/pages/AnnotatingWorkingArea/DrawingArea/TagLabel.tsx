@@ -1,12 +1,10 @@
-import React, {useState} from "react";
+import React from "react";
 import Tag from "../../../data/Tag";
-import {HexColorPicker} from "react-colorful";
 import cross from "../../../assets/cross.png"
 
 interface TagProps {
     tag: Tag;
     onClick?: (tag: Tag) => void;
-    onUpdateColor?: (newColor: string) => void;
     onTagRemove?: (tag: Tag) => void;
     mode: TagLabelMode;
     isPicked: boolean;
@@ -15,10 +13,9 @@ interface TagProps {
 
 export enum TagLabelMode {ANNOTATING, EDITING}
 
-export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor, onTagRemove, isPicked, showId}) => {
+export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onTagRemove, isPicked, showId}) => {
 
     const colorPadWrapperRef = React.createRef<HTMLDivElement>();
-    const [color, setColor] = useState(tag.color);
 
     let opacity = isPicked || mode === TagLabelMode.EDITING ? "FF" : "30";
     let textColor = isPicked || mode === TagLabelMode.EDITING ? "white" : "black";
@@ -31,10 +28,6 @@ export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor,
 
     const handleOnClick = () => {
         if (onClick) onClick(tag);
-    }
-
-    const handleSetColor = (newColor: string) => {
-        setColor(newColor);
     }
 
     const tagOuterStyle = {
@@ -51,15 +44,6 @@ export const TagLabel: React.FC<TagProps> = ({tag, onClick, mode, onUpdateColor,
 
     return (
         <div style={{position: "relative", marginBottom: 10}}>
-            {isPicked && mode === TagLabelMode.EDITING && (
-                <HexColorPicker
-                    color={color}
-                    onChange={handleSetColor}
-                    style={{position: "absolute", top: 30, left: 20, zIndex: 2}}
-                    onBlur={() => {
-                        if (onUpdateColor) onUpdateColor(color);
-                    }}/>
-            )}
             <div className="tagOuter" onMouseEnter={toggleHover} onMouseLeave={toggleHover} style={tagOuterStyle}>
                 <div ref={colorPadWrapperRef} style={colorPadStyle} className="tagColorPadNonHover"></div>
                 <div className="tag"

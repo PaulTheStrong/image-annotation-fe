@@ -32,7 +32,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ onCommentAdd }) => {
                 onChange={handleInputChange}
                 placeholder="Enter your comment"
             />
-            <button type="submit">Add comment</button>
+            <button type="submit" className="btn">Add comment</button>
         </form>
     );
 };

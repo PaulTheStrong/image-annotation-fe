@@ -1,6 +1,6 @@
 import React from "react";
 import cross from "../../assets/cross.png"
-import cursor from "../../assets/cursor.png"
+import cursor_pic from "../../assets/cursor.png"
 import bbox from "../../assets/bbox.png"
 import keypoints from "../../assets/keypoints.png"
 import polygon from "../../assets/polygon.png"
@@ -25,7 +25,7 @@ export const AnnotatingWorkingAreaHeader: React.FC<AnnotatingWorkingAreaHeaderPr
             <div
                 className={`${!currentAnnotationType ? 'headerBtnActive' : ''} headerBtn`}
                 onClick={() => onAnnotationTypeChange(undefined)}>
-                <img src={cursor} alt=""/>
+                <img src={cursor_pic} alt=""/>
             </div>
             <div className="headerBtn" onClick={onDelete}>
                 <img src={cross} alt=""/>

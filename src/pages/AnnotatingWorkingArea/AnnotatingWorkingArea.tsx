@@ -94,27 +94,22 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({cur
     };
 
     useEffect(() => {
-        axios.get<Tag[]>(PROJECT_TAGS_BASE_URL.replace("{projectId}", projectId.toString())).then((res) => {
-            const tags = res.data as Tag[];
+
+        const tmpAnnotations: Annotation[] = [];
+        const addAnnotationsToArray = (data: any[], tags: Tag[], annotationType: AnnotationType) => {
+            tmpAnnotations.push(...data.map(annotation => createAnnotationFromData(annotation, tags, annotationType)));
+        }
+
+        const fetchData = async () => {
+            let response = await axios.get<Tag[]>(PROJECT_TAGS_BASE_URL.replace("{projectId}", projectId.toString()));
+            let tags = await response.data;
+            await addAnnotationsToArray((await axios.get<any[]>(`${BBOX_ANNOTATIONS_BASE_URL}/${imageId}`)).data, tags, AnnotationType.BOUNDING_BOX);
+            await addAnnotationsToArray((await axios.get<any[]>(`${POLYGON_ANNOTATIONS_BASE_URL}/${imageId}`)).data, tags, AnnotationType.POLYGON);
             setTags(tags);
-            return tags;
-        }).then(
-                tags => {
-                    axios.get<any[]>(`${BBOX_ANNOTATIONS_BASE_URL}/${imageId}`)
-                        .then(res => res.data)
-                        .then((data) => {
-                            setAnnotations(prev => data.map(annotation => createAnnotationFromData(annotation, tags, AnnotationType.BOUNDING_BOX)))
-                        }).then(() => {
-                        axios.get<any[]>(`${POLYGON_ANNOTATIONS_BASE_URL}/${imageId}`)
-                            .then(res => res.data)
-                            .then((data) => {
-                                setAnnotations(prev => [
-                                    ...prev,
-                                    ...(data.map(annotation => createAnnotationFromData(annotation, tags, AnnotationType.POLYGON)))
-                                ])
-                            })
-                    })
-                })
+            setAnnotations(tmpAnnotations);
+        }
+
+        fetchData();
     }, [imageId, projectId]);
 
     useEffect(() => {
@@ -127,17 +122,17 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({cur
         setCurrentAnnotationType(annotation?.annotationType);
     }
 
-    const handleAddComment = (comment: Comment) => {
-        axios.post(replaceRefs(COMMENTS_BASE_URL, {projectId: projectId, imageId: imageId}), comment)
-            .then(res => setComments(prev => [res.data, ...prev]));
+    const handleAddComment = async (comment: Comment) => {
+        let res = await axios.post(replaceRefs(COMMENTS_BASE_URL, {projectId: projectId, imageId: imageId}), comment);
+        setComments(prev => [res.data, ...prev]);
     }
 
-    const handleResolveComment = (comment: Comment) => {
-        axios.put(replaceRefs(COMMENTS_BASE_URL, {
+    const handleResolveComment = async (comment: Comment) => {
+        await axios.put(replaceRefs(COMMENTS_BASE_URL, {
             projectId: projectId,
             imageId: imageId
-        }) + `/${comment.id}/resolve?isResolved=${comment.isResolved}`)
-            .then(() => setComments(prev => prev.map(com => com.id === comment.id ? comment : com)));
+        }) + `/${comment.id}/resolve?isResolved=${comment.isResolved}`);
+        setComments(prev => prev.map(com => com.id === comment.id ? comment : com));
     }
 
     const deleteCurrentAnnotation = async () => {
