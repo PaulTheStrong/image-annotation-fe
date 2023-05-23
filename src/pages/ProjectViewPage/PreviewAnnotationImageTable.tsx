@@ -5,16 +5,27 @@ import {PreviewAnnotationImageTableRow} from "./PreviewAnnotationImageTableRow";
 interface PreviewAnnotationImageTableProps {
     annotationImages: AnnotationImage[];
     onImageRowClick?: (annotationImage: string) => void;
+    onImageCheck: (id: string, name: string, isChecked: boolean) => void;
+    onSelectAll: () => void;
+    selectedInitialValue: boolean | null;
 }
 
-export const PreviewAnnotationImageTable: React.FC<PreviewAnnotationImageTableProps> = ({
-        annotationImages, onImageRowClick
+export const PreviewAnnotationImageTable: React.FC<PreviewAnnotationImageTableProps> = (
+    {
+        annotationImages,
+        onImageRowClick,
+        onImageCheck,
+        onSelectAll,
+        selectedInitialValue
     }) => {
 
     return (
         <div className="imageTable">
             <div className="imageTableHeader imageTableRow">
-                <div className="imageTableCheckBox"><input type="checkbox"/></div>
+                <div className="imageTableCheckBox"><input defaultChecked={selectedInitialValue ?? false} type="checkbox" onClick={e => {
+                    e.stopPropagation();
+                    onSelectAll();
+                }}/></div>
                 <div className="imageTableId">ID</div>
                 <div className="imageTableCompletedAt">Completed</div>
                 <div className="imageTableCompletedBy">Annotated by</div>
@@ -22,7 +33,9 @@ export const PreviewAnnotationImageTable: React.FC<PreviewAnnotationImageTablePr
                 <div className="imageTablePreview">Name</div>
             </div>
             {annotationImages.map(image => (
-                <PreviewAnnotationImageTableRow imageData={image} onImageRowClick={onImageRowClick} key={image.id}/>
+                <PreviewAnnotationImageTableRow imageData={image} onImageRowClick={onImageRowClick} key={image.id}
+                                                onImageCheck={onImageCheck}
+                                                selectedInitialValue={selectedInitialValue}/>
             ))}
         </div>
     );

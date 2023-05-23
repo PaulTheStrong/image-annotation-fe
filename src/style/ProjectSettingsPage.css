@@ -21,3 +21,8 @@
     max-height: 200px;
     overflow-y: scroll;
 }
+
+.invitationTable {
+    max-height: 250px;
+    overflow-y: scroll;
+}

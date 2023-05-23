@@ -1,0 +1,23 @@
+.licensesContainer {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.license {
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.license-non-expired {
+    border: 1px solid green;
+    background-color: rgba(200, 255, 89, 0.76);
+}
+
+.license-expired {
+    background-color: #f66868;
+    border: 1px solid red;
+}

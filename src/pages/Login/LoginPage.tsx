@@ -1,6 +1,4 @@
-import React, {useEffect, useState} from "react";
-import axios, {toFormData} from "axios";
-import {HOST} from "../../util/constants";
+import React, {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 
 interface LoginPageProps {

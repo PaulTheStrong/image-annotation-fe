@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Form, Button } from "react-bootstrap";
+import {useState} from "react";
+import {Button, Form} from "react-bootstrap";
 
 function RegisterForm() {
     const [email, setEmail] = useState("");

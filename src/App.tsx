@@ -5,34 +5,28 @@ import "./style/ProjectSettingsPage.css"
 import "./style/TagList.css"
 import "./style/AppHeader.css"
 import "./style/AuthPage.css"
+import "./style/UserPage.css"
 import {ProjectViewPage} from "./pages/ProjectViewPage/ProjectViewPage";
-import {ApplicationHeader} from "./pages/Header/ApplicationHeader";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {ProjectSettingsPage} from "./pages/ProjectSettingsPage/ProjectSettingsPage";
 import {ProjectSelectPage} from "./pages/ProjectSelectPage/ProjectSelectPage";
 import {AuthPage} from "./pages/Login/AuthPage";
 import {RegisterPage} from "./pages/Login/RegisterPage";
 import {LoginPage} from "./pages/Login/LoginPage";
-
-function withHeader(element: JSX.Element, headerText?: string) {
-    return <>
-        <ApplicationHeader headerText={headerText}/>
-        {element}
-    </>;
-}
+import {UserPage} from "./pages/UserPage/UserPage";
 
 const router = createBrowserRouter([
     {
-        path: "/projects/:projectId", element: withHeader(<ProjectViewPage/>)
+        path: "/projects/:projectId", element: <ProjectViewPage/>
     },
     {
-        path: "/projects", element: withHeader(<ProjectSelectPage/>, "Projects")
+        path: "/projects", element: <ProjectSelectPage/>
     },
     {
-        path: "/projects/new", element: withHeader(<ProjectSettingsPage isNew={true}/>, "Create new project")
+        path: "/projects/new", element: <ProjectSettingsPage isNew={true}/>
     },
     {
-        path: "/projects/:projectId/settings", element: withHeader(<ProjectSettingsPage isNew={false}/>)
+        path: "/projects/:projectId/settings", element: <ProjectSettingsPage isNew={false}/>
     },
     {
         path: "/auth", element: <AuthPage />
@@ -42,6 +36,9 @@ const router = createBrowserRouter([
     },
     {
         path: "/", element: <LoginPage />
+    },
+    {
+        path: "/me", element: <UserPage/>
     }
 ])
 

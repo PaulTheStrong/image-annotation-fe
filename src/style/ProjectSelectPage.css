@@ -4,11 +4,22 @@
     text-decoration: none;
     padding: 30px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    flex-wrap: nowrap;
     column-gap: 40px;
     row-gap: 10px;
     justify-content: flex-start;
     overflow-y: scroll;
+}
+
+.projectsSection {
+    width: 100%;
+    text-decoration: none;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 40px;
+    row-gap: 10px;
+    justify-content: flex-start;
 }
 
 .projectSelectCard {
@@ -34,6 +45,32 @@
 .projectSelectCard:hover {
     background-color: #f2f2f2;
     cursor: pointer;
+}
+
+.projectInviteCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+
+    width: 350px;
+    height: 200px;
+    border: 2px solid black;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 20px;
+    transition: 0.3s ease-in-out;
+    text-decoration: none;
+    color: black;
+}
+
+.invite-btns {
+    display: flex;
+    justify-content: space-between;
+}
+
+.invite-btns button {
+    width: 50%;
 }
 
 .createProjectCard {

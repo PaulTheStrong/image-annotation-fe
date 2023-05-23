@@ -2,27 +2,47 @@ import React, {useEffect, useRef, useState} from "react";
 import AnnotationImage from "../../data/AnnotationImage";
 import {PreviewAnnotationImageTable} from "./PreviewAnnotationImageTable";
 import axios from "axios";
-import {PROJECT_IMAGES_BASE_URL} from "../../util/constants";
+import {HOST, PROJECT_IMAGES_BASE_URL} from "../../util/constants";
 import {AnnotatingWorkingArea} from "../AnnotatingWorkingArea/AnnotatingWorkingArea";
 import {useParams} from "react-router-dom";
+import {ApplicationHeader} from "../Header/ApplicationHeader";
+import Project from "../../data/Project";
+import LinkDetails from "../../data/LinkDetails";
+import ExportModal from "./ExportModal";
+import ImageIdName from "./ImageIdName";
 
 interface ProjectViewPageProps {
 }
 
 export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
 
-    const projectId = Number(useParams<{projectId: string}>().projectId);
+    const projectId = Number(useParams<{ projectId: string }>().projectId);
     const [annotationImages, setAnnotationImages] = useState<Map<string, AnnotationImage>>(new Map());
     const [currentImageId, setCurrentImageId] = useState<string>();
+    const [projectName, setProjectName] = useState('');
+    const [exportImageIds, setExportImageIds] = useState<ImageIdName[]>([])
+    const [isExport, setIsExport] = useState(false);
+    const [selectedInitialValue, setSelectedInitialValue] = useState<boolean | null>(null);
 
     const previewAnnotationImageTableRef = useRef<HTMLDivElement>(null);
     const drawAreaRef = useRef<HTMLDivElement>(null);
 
+
+    const fetchImages = async () => {
+        let imgResp = await axios.get<AnnotationImage[]>(PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()));
+        setAnnotationImages(new Map(imgResp.data.map(img => [img.id!, img])));
+        setCurrentImageId(undefined);
+        setExportImageIds([]);
+    }
+
     useEffect(() => {
-        axios.get<AnnotationImage[]>(PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()))
-            .then(res => setAnnotationImages(
-                new Map(res.data.map(img => [img.id!, img]))
-            ));
+        const fetchData = async () => {
+            fetchImages();
+            let prjResp = await axios.get<Project>(`${HOST}/projects/${projectId}`);
+            setProjectName(prjResp.data.name);
+        }
+
+        fetchData();
     }, [projectId])
 
     const onCurrentImageChange = (newImageId: string) => {
@@ -41,15 +61,72 @@ export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
         }
     }
 
+    const handleAddImageId = (imageId: ImageIdName) => {
+        setExportImageIds(prev => [...prev, imageId]);
+        setSelectedInitialValue(null);
+    }
+
+    const handleRemoveImageId = (imageId: string) => {
+        setExportImageIds(prev => prev.filter(id => id.id !== imageId));
+        setSelectedInitialValue(null);
+    }
+
+    const handleSelectAll = () => {
+        if (exportImageIds.length !== annotationImages.size) {
+            setExportImageIds(
+                [
+                    ...Array.from(annotationImages.values()).map(img => {
+                        return {id: img.id!, name: img.fileName}
+                    })])
+            setSelectedInitialValue(true);
+
+        } else {
+            setExportImageIds([]);
+            setSelectedInitialValue(false);
+        }
+    }
+
+    const handleDeleteImages = async () => {
+        exportImageIds.forEach(async (data) => {
+            await axios.delete(`${HOST}/projects/${projectId}/images/${data.id}`);
+            annotationImages.delete(data.id);
+        });
+        setAnnotationImages(annotationImages);
+    }
+
+    let links: LinkDetails[] = [
+        {text: "Projects", uri: "/projects"},
+        {text: "Settings", uri: `/projects/${projectId}/settings`},
+        {text: "Profile", uri: "/me"}
+    ];
+    if (exportImageIds.length !== 0) {
+        links = [{text: "Export", onClick: () => setIsExport(true)}, ...links]
+        links = [...links, {text: "Delete", onClick: () => handleDeleteImages()}]
+    }
+
     return (
-        <div className="projectViewPage">
-            <div ref={previewAnnotationImageTableRef} className="previewAnnotationImageTableImageNonPicked">
-                <PreviewAnnotationImageTable annotationImages={Array.from(annotationImages.values())}
-                                             onImageRowClick={onCurrentImageChange}/>
+        <>
+            {isExport && <ExportModal imageIds={exportImageIds} onExit={() => setIsExport(false)}/>}
+            <ApplicationHeader links={links} headerText={`Project "${projectName}"`}/>
+            <div className="projectViewPage">
+                <div ref={previewAnnotationImageTableRef} className="previewAnnotationImageTableImageNonPicked">
+                    <PreviewAnnotationImageTable
+                        annotationImages={Array.from(annotationImages.values())}
+                        onImageRowClick={onCurrentImageChange}
+                        onImageCheck={(id: string, name: string, isChecked: boolean) => isChecked ? handleAddImageId({
+                            id,
+                            name
+                        }) : handleRemoveImageId(id)}
+                        onSelectAll={handleSelectAll}
+                        selectedInitialValue={selectedInitialValue}
+                    />
+                </div>
+                <div ref={drawAreaRef} className="drawAreaCanvasNonPicked">
+                    {currentImageId && (<AnnotatingWorkingArea
+                        key={currentImageId}
+                        currentImage={annotationImages.get(currentImageId)!}/>)}
+                </div>
             </div>
-            <div ref={drawAreaRef} className="drawAreaCanvasNonPicked">
-                {currentImageId && (<AnnotatingWorkingArea key={currentImageId} currentImage={annotationImages.get(currentImageId)!} />)}
-            </div>
-        </div>
+        </>
     );
 }

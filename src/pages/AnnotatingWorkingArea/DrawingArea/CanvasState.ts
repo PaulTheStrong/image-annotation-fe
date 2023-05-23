@@ -4,4 +4,3 @@ export enum CanvasState {
     PICKED_ITEM,
     DRAGGING_ITEM
 }
-

@@ -25,6 +25,7 @@ import {useParams} from "react-router-dom";
 import {PolygonAnnotation} from "../../data/PolygonAnnotation";
 import {createBBoxFromData, handleBBoxAddReq, sendBboxUpdateReq} from "./DrawingArea/requests/BboxRequests";
 import {createPolygonFromData, handlePolygonAddReq, sendPolygonUpdateReq} from "./DrawingArea/requests/PolygonRequests";
+import ExportModal from "../ProjectViewPage/ExportModal";
 
 interface AnnotatingWorkingAreaProps {
     currentImage: AnnotationImage;
@@ -103,9 +104,11 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({cur
         const fetchData = async () => {
             let response = await axios.get<Tag[]>(PROJECT_TAGS_BASE_URL.replace("{projectId}", projectId.toString()));
             let tags = await response.data;
+            let commentsResponse = await axios.get<Comment[]>(replaceRefs(COMMENTS_BASE_URL, {projectId, imageId}));
             await addAnnotationsToArray((await axios.get<any[]>(`${BBOX_ANNOTATIONS_BASE_URL}/${imageId}`)).data, tags, AnnotationType.BOUNDING_BOX);
             await addAnnotationsToArray((await axios.get<any[]>(`${POLYGON_ANNOTATIONS_BASE_URL}/${imageId}`)).data, tags, AnnotationType.POLYGON);
             setTags(tags);
+            setComments(commentsResponse.data);
             setAnnotations(tmpAnnotations);
         }
 
