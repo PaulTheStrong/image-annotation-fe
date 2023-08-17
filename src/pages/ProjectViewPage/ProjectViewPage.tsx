@@ -91,7 +91,13 @@ export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
             await axios.delete(`${HOST}/projects/${projectId}/images/${data.id}`);
             annotationImages.delete(data.id);
         });
-        setAnnotationImages(annotationImages);
+        setAnnotationImages(new Map(annotationImages));
+    }
+
+    const updateStatus = (updateImage: AnnotationImage) => {
+        setAnnotationImages(annotationImages =>
+            new Map(Array.from(annotationImages.entries()).map(entry => [entry[0], entry[0] === updateImage.id ? updateImage : entry[1]]))
+        );
     }
 
     let links: LinkDetails[] = [
@@ -113,16 +119,14 @@ export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
                     <PreviewAnnotationImageTable
                         annotationImages={Array.from(annotationImages.values())}
                         onImageRowClick={onCurrentImageChange}
-                        onImageCheck={(id: string, name: string, isChecked: boolean) => isChecked ? handleAddImageId({
-                            id,
-                            name
-                        }) : handleRemoveImageId(id)}
+                        onImageCheck={(id: string, name: string, isChecked: boolean) => isChecked ? handleAddImageId({id, name}) : handleRemoveImageId(id)}
                         onSelectAll={handleSelectAll}
                         selectedInitialValue={selectedInitialValue}
                     />
                 </div>
                 <div ref={drawAreaRef} className="drawAreaCanvasNonPicked">
                     {currentImageId && (<AnnotatingWorkingArea
+                        onCurrentImageUpdated={updateStatus}
                         key={currentImageId}
                         currentImage={annotationImages.get(currentImageId)!}/>)}
                 </div>

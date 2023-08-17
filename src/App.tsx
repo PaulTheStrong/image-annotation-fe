@@ -6,6 +6,9 @@ import "./style/TagList.css"
 import "./style/AppHeader.css"
 import "./style/AuthPage.css"
 import "./style/UserPage.css"
+import "./style/PurchaseLicensePage.css"
+import "./style/Stripe.css"
+
 import {ProjectViewPage} from "./pages/ProjectViewPage/ProjectViewPage";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {ProjectSettingsPage} from "./pages/ProjectSettingsPage/ProjectSettingsPage";
@@ -14,6 +17,8 @@ import {AuthPage} from "./pages/Login/AuthPage";
 import {RegisterPage} from "./pages/Login/RegisterPage";
 import {LoginPage} from "./pages/Login/LoginPage";
 import {UserPage} from "./pages/UserPage/UserPage";
+import {PurchaseLicensePage} from "./pages/PurchaseLicensePage/PurchaseLicensePage";
+import AccessDeniedPage from "./pages/AccessDeniedPage";
 
 const router = createBrowserRouter([
     {
@@ -39,6 +44,12 @@ const router = createBrowserRouter([
     },
     {
         path: "/me", element: <UserPage/>
+    },
+    {
+        path: "/purchase", element: <PurchaseLicensePage />
+    },
+    {
+        path: "/access-denied", element: <AccessDeniedPage />
     }
 ])
 

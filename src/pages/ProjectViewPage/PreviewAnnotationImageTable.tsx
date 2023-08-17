@@ -26,11 +26,10 @@ export const PreviewAnnotationImageTable: React.FC<PreviewAnnotationImageTablePr
                     e.stopPropagation();
                     onSelectAll();
                 }}/></div>
-                <div className="imageTableId">ID</div>
-                <div className="imageTableCompletedAt">Completed</div>
+                <div className="imageTableId">Name</div>
+                <div className="imageTableCompletedAt">Status</div>
                 <div className="imageTableCompletedBy">Annotated by</div>
                 <div className="imageTablePreview">Image</div>
-                <div className="imageTablePreview">Name</div>
             </div>
             {annotationImages.map(image => (
                 <PreviewAnnotationImageTableRow imageData={image} onImageRowClick={onImageRowClick} key={image.id}

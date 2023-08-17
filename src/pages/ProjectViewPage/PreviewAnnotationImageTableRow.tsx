@@ -18,6 +18,8 @@ export const PreviewAnnotationImageTableRow: React.FC<PreviewAnnotationImageTabl
         selectedInitialValue
     }) => {
 
+    let [isDone, setIdDone] = useState(Math.ceil(Math.random() * 2)  === 1);
+
     const projectId = Number(useParams<{ projectId: string }>().projectId);
 
     const imageSrc = PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()) + "/" + imageData.id + "/downloadPreview";
@@ -35,6 +37,19 @@ export const PreviewAnnotationImageTableRow: React.FC<PreviewAnnotationImageTabl
         }
     }, [selectedInitialValue])
 
+    const getStatusTag = () => {
+        switch (imageData.status) {
+            case 0:
+                return <div className="imageTableCompletedAt" style={{color: "blue"}}>In Progress</div>
+            case 1:
+                return  <div className="imageTableCompletedAt" style={{color: "red"}}>Done</div>
+            case 2:
+                return  <div className="imageTableCompletedAt" style={{color: "green"}}>Approved</div>
+            default:
+                return <div></div>
+        }
+    }
+
     return (
         <div className="imageTableRow" onClick={() => {
             if (onImageRowClick && imageData.id) onImageRowClick(imageData.id)
@@ -42,13 +57,12 @@ export const PreviewAnnotationImageTableRow: React.FC<PreviewAnnotationImageTabl
             <div className="imageTableCheckBox" onClick={handleImageCheck}>
                 <input type="checkbox" checked={isChecked} readOnly={true}/>
             </div>
-            <div className="imageTableId">{imageData.id}</div>
-            <div className="imageTableCompletedAt"></div>
-            <div className="imageTableCompletedBy"></div>
+            <div className="imageTableId">{imageData.fileName}</div>
+            {getStatusTag()}
+            <div className="imageTableCompletedBy">{imageData.annotatedBy}</div>
             <div className="imageTablePreview">
                 <img src={imageSrc} alt={imageData.fileName} className="annotationImagePreview"/>
             </div>
-            <div className="imageTableFileName">{imageData.fileName}</div>
         </div>
     );
 }

@@ -45,7 +45,7 @@ export const InvitationTableRow: React.FC<InvitationTableRowProps> = (
             <td width="6%" style={centered}><input type="checkbox" onChange={(e) => setIsPC(e.target.checked)} checked={isPC}/></td>
             <td width="11%"><button type="button" className="btn" value="Update" onClick={() => handleInvitationUpdate()}>Update</button></td>
             <td width="11%"><button type="button" className="btn" value="Delete" onClick={() => onInvitationDelete(invitation)}>Delete</button></td>
-    </tr>
+        </tr>
     )
 
 }
