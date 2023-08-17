@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - feature/**
 jobs:
   build-push-docker:
     runs-on: ubuntu-latest

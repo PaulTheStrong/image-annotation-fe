@@ -28,14 +28,6 @@ export const PurchaseLicensePage: React.FC<PurchaseLicensePageProps> = () => {
         loadLicenses();
     }, [])
 
-    const appearance = {
-        theme: 'stripe',
-    };
-    const options = {
-        clientSecret,
-        appearance,
-    };
-
     const handlePickClick = (licenseTypeId: number) => {
         axios.post<any>(`${HOST}/purchase/intent/${licenseTypeId}`, {
             method: "POST",
@@ -59,7 +51,7 @@ export const PurchaseLicensePage: React.FC<PurchaseLicensePageProps> = () => {
             <div className="purchaseLicensePage">
                 <h1>Purchase a new license</h1>
                 <div className="licenseTypesContainer">
-                    {licenseTypes.map(licenseType => <LicenseTypeCard licenseType={licenseType} key={licenseType.id} onBuy={handlePickClick} isActive={currentLicenseType == licenseType.id}/>)}
+                    {licenseTypes.map(licenseType => <LicenseTypeCard licenseType={licenseType} key={licenseType.id} onBuy={handlePickClick} isActive={currentLicenseType === licenseType.id}/>)}
                 </div>
                 {clientSecret && (
                     <Elements options={{clientSecret: clientSecret}} stripe={stripePromise}>

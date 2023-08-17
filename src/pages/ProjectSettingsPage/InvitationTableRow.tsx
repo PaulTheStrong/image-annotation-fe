@@ -20,7 +20,7 @@ export const InvitationTableRow: React.FC<InvitationTableRowProps> = (
         textAlign: "center"
     }
 
-    const [email, setEmail] = useState(invitation.email);
+    const [email] = useState(invitation.email);
     const [isAN, setIsAN] = useState(invitation.roles.findIndex(id => id === 1) !== -1);
     const [isQA, setIsQA] = useState(invitation.roles.findIndex(id => id === 2) !== -1);
     const [isPC, setIsPC] = useState(invitation.roles.findIndex(id => id === 3) !== -1);

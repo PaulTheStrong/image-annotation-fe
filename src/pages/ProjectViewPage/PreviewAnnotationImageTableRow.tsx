@@ -18,8 +18,6 @@ export const PreviewAnnotationImageTableRow: React.FC<PreviewAnnotationImageTabl
         selectedInitialValue
     }) => {
 
-    let [isDone, setIdDone] = useState(Math.ceil(Math.random() * 2)  === 1);
-
     const projectId = Number(useParams<{ projectId: string }>().projectId);
 
     const imageSrc = PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()) + "/" + imageData.id + "/downloadPreview";

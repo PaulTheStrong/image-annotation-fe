@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {AnnotatingWorkingAreaHeader} from "./AnnotatingWorkingAreaHeader";
-import {AnnotatingWorkingAreaFooter} from "./AnnotatingWorkingAreaFooter";
 import {AnnotationListSideBar} from "./AnnotationListSideBar/AnnotationListSideBar";
 import {AnnotationQualityRightSidebar} from "./AnnotationQualityRightSidebar/AnnotationQualityRightSidebar";
 import {BoundingBox} from "../../data/BoundingBox";
@@ -38,7 +37,7 @@ const createAnnotationFromData = (data: any, tags: Tag[], type: AnnotationType):
         case AnnotationType.POLYGON:
             return createPolygonFromData(data, tags);
     }
-    throw 42;
+    throw new Error(`No such annotation type ${type}`);
 }
 
 export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({currentImage, onCurrentImageUpdated}) => {
@@ -191,7 +190,7 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({cur
                                 currentAnnotationType={currentAnnotationType}
                                 onAnnotationAdd={handleAnnotationAdd}
                                 onAnnotationRemove={() => {
-                                    throw 42
+                                    throw new Error("Not implemented")
                                 }}
                                 onAnnotationUpdate={handleAnnotationUpdate}
                                 onTagClick={handleTagClick}

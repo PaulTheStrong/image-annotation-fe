@@ -27,15 +27,14 @@ export const ProjectViewPage: React.FC<ProjectViewPageProps> = () => {
     const previewAnnotationImageTableRef = useRef<HTMLDivElement>(null);
     const drawAreaRef = useRef<HTMLDivElement>(null);
 
-
-    const fetchImages = async () => {
-        let imgResp = await axios.get<AnnotationImage[]>(PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()));
-        setAnnotationImages(new Map(imgResp.data.map(img => [img.id!, img])));
-        setCurrentImageId(undefined);
-        setExportImageIds([]);
-    }
-
     useEffect(() => {
+        const fetchImages = async () => {
+            let imgResp = await axios.get<AnnotationImage[]>(PROJECT_IMAGES_BASE_URL.replace("{projectId}", projectId.toString()));
+            setAnnotationImages(new Map(imgResp.data.map(img => [img.id!, img])));
+            setCurrentImageId(undefined);
+            setExportImageIds([]);
+        }
+
         const fetchData = async () => {
             fetchImages();
             let prjResp = await axios.get<Project>(`${HOST}/projects/${projectId}`);

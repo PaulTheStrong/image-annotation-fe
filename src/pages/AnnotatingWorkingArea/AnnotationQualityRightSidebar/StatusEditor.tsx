@@ -1,4 +1,3 @@
-import Comment from "../../../data/Comment";
 import React from "react";
 
 interface CommentFormProps {

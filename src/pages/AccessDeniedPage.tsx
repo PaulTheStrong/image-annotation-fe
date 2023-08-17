@@ -10,7 +10,7 @@ const AccessDeniedPage: React.FC = () => {
             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                 <img
                     src="https://previews.123rf.com/images/arcady31/arcady311101/arcady31110100005/8623333-access-denied-stamp.jpg" // Replace with the URL of your desired image
-                    alt="Fancy Image"
+                    alt="Access denied"
                     style={{width: '300px', height: 'auto', marginBottom: '20px'}}
                 />
                 <h1 style={{textAlign: 'center'}}>403 Access Denied</h1>
