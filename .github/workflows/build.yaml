@@ -14,3 +14,8 @@ jobs:
         run: yarn install
       - name: Create build
         run: npm run build
+      - name: Export version variable
+        run: |
+          echo "IMAGE_NAME=$(cat package.json | jq -r '(.name + "'":"'" + .version)')" >> "$GITHUB_ENV";
+      - name: Build docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }} .
