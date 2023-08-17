@@ -1,0 +1,16 @@
+name: build-push-docker
+on:
+  push:
+    branches:
+      - feature/**
+jobs:
+  build-push-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up node
+        uses: actions/setup-node@v3
+      - name: Install packages
+        run: yarn install
+      - name: Create build
+        run: npm run build

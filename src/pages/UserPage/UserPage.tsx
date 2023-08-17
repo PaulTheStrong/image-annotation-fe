@@ -134,13 +134,21 @@ export const UserPage: React.FC<UserPageProps> = () => {
                         {isEditing ? "Save" : "Edit data"}
                     </button>
 
+                    { licenses.filter(license => new Date(Date.now()).getTime() < Date.parse(license.licenseEnd.toString())).length === 0 &&
+
+                    <button className="btn" onClick={() => {
+                        navigate("/purchase");
+                    }}>
+                        Purchase license
+                    </button>
+                    }
+
                     <button className="btn" onClick={() => {
                         localStorage.clear();
                         navigate("/");
                     }}>
                         Log out
                     </button>
-
 
                 </div>
             </div>

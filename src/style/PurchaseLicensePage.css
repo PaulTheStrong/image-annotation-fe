@@ -1,0 +1,29 @@
+.purchaseLicensePage {
+    width: 60%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.licenseTypesContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    column-gap: 20px;
+}
+
+.licenseTypeCard {
+    width: 200px;
+    height: 200px;
+    font-size: 18px;
+    text-align: center;
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+}
+.licenseTypeCard * {
+    margin: 5px 5px;
+}
+
+.licenseTypeCardActive {
+    border-width: 5px;
+}

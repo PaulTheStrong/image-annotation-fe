@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {AnnotatingWorkingAreaHeader} from "./AnnotatingWorkingAreaHeader";
-import {AnnotatingWorkingAreaFooter} from "./AnnotatingWorkingAreaFooter";
 import {AnnotationListSideBar} from "./AnnotationListSideBar/AnnotationListSideBar";
 import {AnnotationQualityRightSidebar} from "./AnnotationQualityRightSidebar/AnnotationQualityRightSidebar";
 import {BoundingBox} from "../../data/BoundingBox";
@@ -9,7 +8,7 @@ import {AnnotatingArea} from "./DrawingArea/AnnotatingArea";
 import axios from "axios";
 import {
     BBOX_ANNOTATIONS_BASE_URL,
-    COMMENTS_BASE_URL,
+    COMMENTS_BASE_URL, HOST,
     POLYGON_ANNOTATIONS_BASE_URL,
     PROJECT_TAGS_BASE_URL,
     replaceRefs
@@ -25,10 +24,10 @@ import {useParams} from "react-router-dom";
 import {PolygonAnnotation} from "../../data/PolygonAnnotation";
 import {createBBoxFromData, handleBBoxAddReq, sendBboxUpdateReq} from "./DrawingArea/requests/BboxRequests";
 import {createPolygonFromData, handlePolygonAddReq, sendPolygonUpdateReq} from "./DrawingArea/requests/PolygonRequests";
-import ExportModal from "../ProjectViewPage/ExportModal";
 
 interface AnnotatingWorkingAreaProps {
     currentImage: AnnotationImage;
+    onCurrentImageUpdated: (annotationImage: AnnotationImage) => void;
 }
 
 const createAnnotationFromData = (data: any, tags: Tag[], type: AnnotationType): Annotation => {
@@ -38,10 +37,10 @@ const createAnnotationFromData = (data: any, tags: Tag[], type: AnnotationType):
         case AnnotationType.POLYGON:
             return createPolygonFromData(data, tags);
     }
-    throw 42;
+    throw new Error(`No such annotation type ${type}`);
 }
 
-export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({currentImage}) => {
+export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({currentImage, onCurrentImageUpdated}) => {
 
     const projectId = Number(useParams<{ projectId: string }>().projectId);
 
@@ -154,6 +153,26 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({cur
         }
     }
 
+    const updateImageStatus = async (statusId: number) => {
+        let status;
+        switch (statusId) {
+            case 0:
+                status = "IN_PROGRESS"
+                break;
+            case 1:
+                status = "DONE";
+                break;
+            case 2:
+                status = "APPROVED";
+                break;
+            default:
+                throw new Error("Status not found");
+        }
+        await axios.patch(`${HOST}/projects/${projectId}/images/${imageId}/status/${status}`);
+        currentImage.status = statusId;
+        onCurrentImageUpdated(currentImage);
+    }
+
     return (
         <div className="annotationWorkingArea">
             <TagsContext.Provider value={new Map(tags.map(tag => [tag.id!, tag]))}>
@@ -171,17 +190,20 @@ export const AnnotatingWorkingArea: React.FC<AnnotatingWorkingAreaProps> = ({cur
                                 currentAnnotationType={currentAnnotationType}
                                 onAnnotationAdd={handleAnnotationAdd}
                                 onAnnotationRemove={() => {
-                                    throw 42
+                                    throw new Error("Not implemented")
                                 }}
                                 onAnnotationUpdate={handleAnnotationUpdate}
                                 onTagClick={handleTagClick}
                                 currentTag={currentTag}
                                 onAnnotationPick={pickAnnotation}
                             />
-                            <AnnotationQualityRightSidebar comments={comments} onCommentAdd={handleAddComment}
-                                                           onStatusChange={handleResolveComment}/>
+                            <AnnotationQualityRightSidebar
+                                comments={comments}
+                                onCommentAdd={handleAddComment}
+                                onCommentStatusChange={handleResolveComment}
+                                currentStatus={currentImage.status}
+                                onStatusChange={updateImageStatus}/>
                         </div>
-                        <AnnotatingWorkingAreaFooter/>
                     </ImageContext.Provider>
                 </CurrentAnnotationContext.Provider>
             </TagsContext.Provider>

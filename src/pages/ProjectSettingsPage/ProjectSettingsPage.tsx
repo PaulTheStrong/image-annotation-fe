@@ -136,7 +136,8 @@ export const ProjectSettingsPage: React.FC<ProjectSettingsPageProps> = ({isNew})
         <>
             <ApplicationHeader links={[
                 {text: "Projects", uri: "/projects"},
-                {text: "Profile", uri: "/me"}
+                {text: "Back", uri: `/projects/${projectId}`},
+                {text: "Profile", uri: "/me"},
             ]} headerText={isNew ? "Create new project" : project.name}/>
             <div className="projectSettingsPage">
                 <div className="form-container">

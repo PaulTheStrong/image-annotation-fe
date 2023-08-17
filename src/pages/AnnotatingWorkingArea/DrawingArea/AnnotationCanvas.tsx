@@ -328,7 +328,7 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = (
 
     return (
         <div style={{width: "100%"}}>
-            <img src={backgroundImageUrl} onLoad={handleImageLoad} style={{display: "none"}}/>
+            <img src={backgroundImageUrl} onLoad={handleImageLoad} style={{display: "none"}} alt=""/>
             <canvas
                 ref={canvasRef}
                 onMouseMove={e => handleMouseEvent(e, MouseEventType.MOVE)}

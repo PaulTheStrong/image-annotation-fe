@@ -24,7 +24,7 @@ axios.interceptors.response.use(
             // Redirect the user to the "/" URI
             window.location.href = '/';
         } else if (error.response && error.response.status === 403) {
-            window.location.href = '/projects';
+            window.location.href = '/access-denied';
         }
         return Promise.reject(error);
     }

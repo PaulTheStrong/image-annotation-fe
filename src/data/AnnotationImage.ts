@@ -7,11 +7,15 @@ export default class AnnotationImage {
     width?: number;
     height?: number;
     comments: Comment[];
+    status: number;
+    annotatedBy?: string;
 
-    constructor(projectId: number, imageName: string, comments: Comment[], id?: string) {
+    constructor(projectId: number, imageName: string, comments: Comment[], status: number, annotatedBy?: string, id?: string) {
         this.id = id;
         this.comments = comments;
         this.projectId = projectId;
         this.fileName = imageName;
+        this.status = status;
+        this.annotatedBy = annotatedBy;
     }
 }

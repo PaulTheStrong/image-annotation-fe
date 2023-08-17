@@ -107,7 +107,7 @@ export class PolygonAnnotation implements Annotation {
     }
 
     movePoint(deltaX: number, deltaY: number, point: number): Annotation {
-        let points = this.data.points.map((pt, i) => i == point ? {x: pt.x + deltaX, y: pt.y + deltaY} : pt);
+        let points = this.data.points.map((pt, i) => i === point ? {x: pt.x + deltaX, y: pt.y + deltaY} : pt);
         return new PolygonAnnotation(points, this.tagId, this.color, this.id);
     }
 
