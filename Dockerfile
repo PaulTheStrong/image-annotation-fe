@@ -1,7 +1,5 @@
-FROM node:20-alpine
+FROM nginx
 
-ENV BACKEND_HOST=localhost:8080
-COPY ./build /app
-RUN npm install -g serve
+COPY build /usr/share/nginx/html
 
-CMD ["serve", "-s", "app"]
+RUN chown -R nginx:nginx /usr/share/nginx/html

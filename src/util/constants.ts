@@ -1,4 +1,4 @@
-export const HOST = process.env.BACKEND_HOST || 'http://localhost:8080';
+export const HOST = process.env.REACT_APP_BACKEND_HOST;
 
 export const PROJECT_TAGS_BASE_URL = HOST + "/projects/{projectId}/tags";
 export const PROJECT_IMAGES_BASE_URL = HOST + "/projects/{projectId}/images";
